@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root signature="{24B6FA0B-0143-461A-9758-AEB9E9A9428B}" version="12.0" key="{53A8746E-B859-45A4-99DF-92C1CFFD981D}">
+	<children>
+		<child name="TCF_Digital" key="{7A5E5545-2A4E-4C12-A3E2-2680092C5262}" type="Project" typeId="{362A8EE5-675E-43A9-869D-06ECE80B0CB4}" pluginName="">
+			<data path="TCF_Digital.mds" />
+		</child>
+	</children>
+	<folders />
+	<testItems key="{36A269F7-D06C-49B1-9B72-7343E17377BA}">
+		<children>
+			<testItem key="{7A5E5545-2A4E-4C12-A3E2-2680092C5262}" enabled="True" timeout="0" stopOnError="True" description="" />
+		</children>
+	</testItems>
+	<variables key="{63DD3617-92F6-45B0-93A9-8EE4B83063B0}">
+		<data Version="3" />
+	</variables>
+	<analysis key="{A870B395-29B5-4A12-AA01-DA8758397F7E}" />
+	<scc key="{00000000-0000-0000-0000-000000000000}" name="">
+		<data />
+	</scc>
+</Root>

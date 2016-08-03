@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root signature="{90D101C8-80C7-48D4-9055-2E451B9BCD75}" version="1140" key="{8E883D30-F3C5-48CE-A08F-F275EC44C989}" type="Tested Applications" typeId="{90D101C8-80C7-48D4-9055-2E451B9BCD75}">
+	<config nodeName="TestedApps" />
+	<testData />
+	<data />
+	<children>
+		<child key="{90C71B9A-9195-410D-A533-148D03E9FB1A}" type="Tested Application" typeId="{FD30A383-63C2-4C25-948C-2595C0F81320}">
+			<config nodeName="TCF_iOS" autorunOnRecording="False" enabled="True" count="1" useFeaturedRuntimeObject="True" userChangeName="True">
+				<runModeParams activeRunMode="iOS">
+					<param name="iOS" parameters="" workFolder="" ipaFileName="V:\TestComplete 12\TCF\TCF.ipa" deploy="True" storeBackup="False" backupFileName="V:\TestComplete 12\TCF\TCF_ORIGINAL_BACKUP.ipa" rootCert="V:\TestComplete 12\TCF\AppleWWDRCA.cer" devCert="V:\TestComplete 12\TCF\ios_development-2.cer" pemFile="V:\TestComplete 12\TCF\Certificates.pem" provisioningFile="V:\TestComplete 12\TCF\D3_Dev.mobileprovision" />
+				</runModeParams>
+			</config>
+			<testData />
+			<data />
+		</child>
+	</children>
+	<folders />
+</Root>

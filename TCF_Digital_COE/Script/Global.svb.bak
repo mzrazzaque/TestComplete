@@ -1,0 +1,49 @@
+﻿' ##############################################################################################
+' ####	Copyright: 2016 TCF Bank
+' ####
+' ####	File Name: Global
+' ####	Test Script Name: N/A
+' ####	Purpose: This file is the home of all global variabled
+' ####
+' ####	Created on: June 30, 2016
+' ####	Created by: Mohammed Razzaque & Shreekumar Raghavan
+' ##############################################################################################
+
+' Global Objects
+Dim objMobileApp
+Dim objStopWatch
+
+' Global Datatype - Strings
+strUserName = ""
+strPassword = ""
+strMiddleName = ""
+strHighSchool = ""
+strSecurityQuestion3 = ""
+strSecurityQuestion4 = ""
+strDeviceName = ""
+strRunenv = "Demo"
+strFileExtension = ".mht"
+strAppResultsPath = "C:\TestCompleteLog"
+strLogFileName = "D3TCFApp"
+strEmailAddress = "mrazzaqu@tcfbank.com;sraghava@tcfbank.com"
+strAppVersion = ""
+strLogFileName = ""
+strTestcasename = ""
+strAppOS = ""
+strAppOSVersion = ""
+strDeviceType = ""
+
+' Global Datatype - String Arrays
+
+
+' Global Datatype - Integers
+intNumberOfLogins = 4
+
+
+' Global Datatype - Integer Arrays
+
+
+' Global Datatype - Characters
+
+
+' Global Datatype - Character Arrays

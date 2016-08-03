@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root signature="{9252F941-DB23-4FCA-AA50-858B33BB4A19}" version="11.40">
+	<children>
+		<child name="Common" key="{978E4BC0-0FC6-4F88-8C92-813BD805CA2A}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
+			<data path="Common.svb" />
+		</child>
+		<child name="Global" key="{8AAD6AA7-CE9D-4FF4-A777-F7E0C9F7AF37}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
+			<data path="Global.svb" />
+		</child>
+		<child name="iOSFunctions" key="{194FE85E-B0CB-4A40-B418-C81C4FCF9111}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
+			<data path="iOSFunctions.svb" />
+		</child>
+		<child name="iOSTestCases" key="{8B08A193-B17F-44AB-B6DE-01D5B22C3EC3}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
+			<data path="iOSTestCases.svb" />
+		</child>
+		<child name="Workspace" key="{DAC03147-D901-4A62-B7C0-BB3669DBA621}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
+			<data path="Workspace.svb" />
+		</child>
+	</children>
+	<folders>
+		<folder caption="Android OS Mobile" description="A logical folder that is used to organize project items and elements." moniker="" />
+		<folder caption="iOS mobile" description="A logical folder that is used to organize project items and elements." moniker="">
+			<references>
+				<ref key="{194FE85E-B0CB-4A40-B418-C81C4FCF9111}" />
+				<ref key="{8B08A193-B17F-44AB-B6DE-01D5B22C3EC3}" />
+			</references>
+		</folder>
+		<folder caption="Online" description="A logical folder that is used to organize project items and elements." moniker="" />
+	</folders>
+</Root>

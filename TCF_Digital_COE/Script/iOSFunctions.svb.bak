@@ -1,0 +1,264 @@
+﻿'USEUNIT Global
+'USEUNIT Common
+
+' ##############################################################################################
+' ####	Copyright: 2016 TCF Bank
+' ####
+' ####	File Name: iOSFunctions
+' ####	Test Script Name: initDevice, cleanUp, captureAppVersion, loginUser, securityAnswer,
+' ####  logoutUser
+' ####	Purpose: This file is the home of all reusable subs & functions
+' ####
+' ####	Created on: June 30, 2016
+' ####	Created by: Mohammed Razzaque & Shreekumar Raghavan
+' ##############################################################################################
+
+Public Sub initDevice
+  ' Checking Device Connection
+  If Mobile.Device("*", 1).Exists Then
+    'Connecting to Mobile
+    Mobile.SetCurrent("*")
+'    If(TestedApps.TCF_iOS.Run)Then    
+'      Else
+'      logMessage "FAIL", "Application executable", "Application executable not found" & VbCr & "Exiting Test ...", 500
+'      Runner.Stop (True)
+'    End If  
+    Mobile.Device("*").Process("TCF Bank").WaitChild "Exists",10000
+    ' Creating TCF App object
+    Set Global.objMobileApp = Mobile.Device("*").Process("TCF Bank")        
+    Else
+    logMessage "FAIL", "Device Availability", "No Devices available" & VbCr & "Exiting Test ...", 500
+    Runner.Stop (True)
+  End If
+End Sub
+
+Public Sub cleanUp
+  Set Global.objMobileApp = Nothing
+  ''TestedApps.Clear
+End Sub
+
+' Capture App, Device and OS Info
+Public Sub captureAppDeviceOSInfo
+  waitForLoadingObject "TCF Logo", objMobileApp, "className", "header-logo"  
+  ' Cappture App Version
+  strAppVer = objMobileApp.FindChild("className", "appVersion", 30).innerText
+  Global.strAppVersion = Right(strAppVer, Len(strAppVer) - 1)
+  logMessage "INFO", "App Version", Global.strAppVersion, 100
+
+  ' Device and OS
+  Global.strDeviceType = Mobile.Device.DeviceInfo.DeviceClass
+  Global.strAppOS = Mobile.Device.OSType
+  Global.strAppOSVersion = Mobile.Device.OSInfo.ProductVersion
+End Sub
+
+Public Sub loginUser (intLoginValue)
+  numberOfLogins (intLoginValue)
+  ' Verify TCF Logo
+  verifyAndLogObjectsExists "className", "header-logo", "TCF Logo"
+  ' Verify User Name Field
+  verifyAndLogObjectsExists "objectIdentifier", "challengeUsername", "User Name Field"
+  ' Verify Password Field
+  verifyAndLogObjectsExists "objectIdentifier", "challengePassword", "Password Field"    
+  ' Verify Save Username Checkbox
+  verifyAndLogObjectsExists "objectIdentifier", "isUsernameSaved", "Save Username CheckBox"    
+  ' Verify Submit Button
+  verifyAndLogObjectsExists "className", "btn btn-default btn-submit", "LogIn Submit Button"
+        
+  ' Login
+  objMobileApp.FindChild ("objectIdentifier", "challengeUsername", 30).SetText(Global.strUserName)  
+  objMobileApp.FindChild ("objectIdentifier", "challengePassword", 30).SetText(Global.strPassword)
+  watchStart
+  objMobileApp.FindChild ("className", "btn btn-default btn-submit", 30).ClickButton  
+  waitForLoadingObject "Secret Answer", objMobileApp, "objectIdentifier", "secretQuestionAnswer"
+  watchStop("mobileLogin")
+End Sub
+
+Public Sub securityAnswer
+  ' Selecting Security Question
+  Dim securityAnswer
+  securityAnswer = ""
+  strSecurityQuestionName = objMobileApp.FindChild ("idStr", "secretQuestion", 30).innerText
+  If stringExist (strSecurityQuestionName, "high school") Then
+    securityAnswer = Global.strHighSchool
+    ElseIf stringExist (strSecurityQuestionName, "middle name") Then
+    securityAnswer = Global.strMiddleName
+  End If
+    
+  ' Verify Secret Question Answer Field
+  verifyAndLogObjectsExists "objectIdentifier", "secretQuestionAnswer", "Secret Question Answer field"
+  ' Verify Submit Button
+  verifyAndLogObjectsExists "className", "btn btn-default btn-submit", "Secret Question Submit Button" 
+  ' Verify Cancel Button
+  verifyAndLogObjectsExists "className", "btn btn-default btn-cancel visible-xs", "Cancel Button"
+    
+  ' Enter Secret Question Answer and Submit
+  objMobileApp.FindChild("objectIdentifier", "secretQuestionAnswer", 30).SetText(securityAnswer)
+  watchStart
+  objMobileApp.FindChild ("className", "btn btn-default btn-submit", 30).ClickButton    
+  waitForLoadingObject "Accounts", objMobileApp, "className", "accounts internal-accounts"
+  watchStop("mobileSecurityAnswer")
+  ' Verify Login
+  verifyAndLogObjectsExists "className", "accounts internal-accounts", "LogIn Verify"
+  ' Verify Networth
+  verifyAndLogObjectsExists "className", "status-bar highlight networth", "Networth Frame"    
+  ' Verify Quick Pay
+  verifyAndLogObjectsExists "Name", "Link(0)", "Networth Link"
+  ' Verify Transfer Now
+  verifyAndLogObjectsExists "Name", "Link(1)", "Transfer Link"
+  ' Verify Deposit 
+  verifyAndLogObjectsExists "Name", "Link(2)", "Deposit Link" 
+End Sub
+
+Public Sub scrapeAccountTotals
+  waitFor(5) ' to be removed after catching the spinner
+  articleContent = objMobileApp.FindChild("className", "status-bar highlight networth", 30).innerText
+  netWorth = Split(articleContent, Chr(10))
+    
+  articleContent = objMobileApp.FindChild("className", "accounts internal-accounts", 30).innerText
+  internalAccounts = Split(articleContent, "Credit Cards and Loans")
+  dAccounts = Split(internalAccounts(0), Chr(10))
+  cAccounts = Split(internalAccounts(1), Chr(10))  
+  ubound(dAccounts)
+  ubound(cAccounts)
+  Dim depositAccountFields(4)
+  j = 0
+  For i = 0 To ubound(dAccounts)
+    If(i = 4)Then
+        depositAccountFields(j) = aqString.Replace(dAccounts(i), "'", "''") & ";" & dAccounts(i+1)
+        j = j+1
+    End If
+    If(i = 7)Then
+        depositAccountFields(j) = aqString.Replace(dAccounts(i), "'", "''") & ";" & dAccounts(i+1)
+        j = j + 1
+    End If
+    If(i = 10)Then
+        depositAccountFields(j) = aqString.Replace(dAccounts(i), "'", "''") & ";" & dAccounts(i+1)
+        j = j + 1
+    End If
+    If(i = 13)Then
+        depositAccountFields(j) = aqString.Replace(dAccounts(i), "'", "''") & ";" & dAccounts(i+1)
+        j = j + 1
+    End If
+    If(i = 16)Then
+        depositAccountFields(j) = aqString.Replace(dAccounts(i), "'", "''") & ";" & dAccounts(i+1)
+        j = j + 1
+    End If        
+    if(i > ubound(dAccounts) - 3)Then
+      Exit For
+    End If
+  Next
+  
+  Dim creditAccountFields(4)
+  j = 0
+  For i = 0 To ubound(cAccounts)
+    If(i = 2)Then
+        creditAccountFields(j) = aqString.Replace(cAccounts(i), "'", "''") & ";" & cAccounts(i+1)
+        j = j+1
+    End If
+    If(i = 5)Then
+        creditAccountFields(j) = aqString.Replace(cAccounts(i), "'", "''") & ";" & cAccounts(i+1)
+        j = j + 1
+    End If
+    If(i = 8)Then
+        creditAccountFields(j) = aqString.Replace(cAccounts(i), "'", "''") & ";" & cAccounts(i+1)
+        j = j + 1
+    End If
+    If(i = 11)Then
+        creditAccountFields(j) = aqString.Replace(cAccounts(i), "'", "''") & ";" & cAccounts(i+1)
+        j = j + 1
+    End If
+    If(i = 14)Then
+        creditAccountFields(j) = aqString.Replace(cAccounts(i), "'", "''") & ";" & cAccounts(i+1)
+        j = j + 1
+    End If        
+    If(i > ubound(cAccounts) - 3)Then
+      Exit For
+    End If
+  Next
+  
+  sqlCheckRecordExist = "select * from AccountSummary where USerId = '" &  Global.strUserName & "'"
+  Set recordExist = fetchInputDataByQuery (sqlCheckRecordExist)
+  
+  If(recordExist.EOF)Then
+  
+    sqlAccountSummary = "INSERT INTO AccountSummary " _
+    & "( UserId, AccountTotals, AllBalances, AllPending, DepositAcct1, DepositAcct2, DepositAcct3, DepositAcct4, DepositAcct5, " _
+    & "CCAndLoansAcct1, CCAndLoansAcct2, CCAndLoansAcct3, CCAndLoansAcct4, CCAndLoansAcct5, WindowsUserName, HostName ) " _
+    & "VALUES ('" &  Global.strUserName & "','" & netWorth(5) & "','" & netWorth(1) & "','" & netWorth(3) _
+    & "','" & depositAccountFields(0) & "','" & depositAccountFields(1) & "','" & depositAccountFields(2) & "','" & depositAccountFields(3) & "','" & depositAccountFields(4)_ 
+    & "','" & creditAccountFields(0) & "','" & creditAccountFields(1) & "','" & creditAccountFields(2) & "','" & creditAccountFields(3) & "','" & creditAccountFields(4)_
+    & "','" & sys.UserName & "','" & sys.HostName & "')"   
+  
+    Else
+    sqlAccountSummary = "UPDATE AccountSummary "_
+    & "SET AccountTotals = '" & netWorth(5) & "'" & ", AllBalances = '" & netWorth(1) & "'" & ", AllPending = '" & netWorth(3) & "'"_
+    & ", DepositAcct1 = '" & depositAccountFields(0) & "'" & ", DepositAcct2 = '" & depositAccountFields(1) & "'" & ", DepositAcct3 = '" & depositAccountFields(2) & "'"_
+    & ", DepositAcct4 = '" & depositAccountFields(3) & "'" & ", DepositAcct5 = '" & depositAccountFields(4) & "'" & ", CCAndLoansAcct1 = '" & creditAccountFields(0) & "'"_
+    & ", CCAndLoansAcct2 = '" & creditAccountFields(1) & "'" & ", CCAndLoansAcct3 = '" & creditAccountFields(2) & "'" & ", CCAndLoansAcct4 = '" & creditAccountFields(3) & "'"_
+    & ", CCAndLoansAcct5 = '" & creditAccountFields(4) & "'" & ", DateAndTime = Now() WHERE UserId = '" & Global.strUserName & "'"
+    
+  End If
+ fetchInputDataByQuery (sqlAccountSummary)    
+
+End Sub
+
+Public Sub clickOnNavToggle 
+  ' Verify Menu Navigation
+  verifyAndLogObjectsExists "className", "col-xs-3 nav-toggle", "Menu Navigation"
+  objMobileApp.FindChild("className", "col-xs-3 nav-toggle", 30).Click
+End Sub
+
+Public Sub logoutUser
+  ' Verify Logout Menu Object and click Logout
+  waitForLoadingObject "DashBoard", objMobileApp, "classname", "glyphicon glyphicon-off"
+  verifyAndLogObjectsExists "namePropStr", "cordova.html#logout", "LogOut"
+  
+  watchStart
+  objMobileApp.FindChild ("classname", "glyphicon glyphicon-off", 30).Click
+  waitForLoadingObject "Logout", objMobileApp, "objectIdentifier", "challengeUsername"
+  watchStop("mobileLogOut")
+  
+  ' Verify Logout
+  verifyAndLogObjectsExists "objectIdentifier", "challengeUsername", "LogOut Sucessful"  
+End Sub
+
+' Selecting Users for Login
+public Sub numberOfLogins (intiValue)
+  sqlLogins = "select * from Login"
+  Set dbRecordSet = fetchInputDataByQuery (sqlLogins)
+  dbRecordSet.MoveFirst
+
+  If dbRecordSet.EOF And dbRecordSet.BOF Then
+    logMessage "Fail", "Number of Records Fetched from DB", "No records found", 500
+    Else
+    intRecordCount = dbRecordSet.RecordCount
+    
+    If Global.intNumberOfLogins <= 0 Then
+      logMessage "Fail", "Number of Logins", "Number of logins requested: " & Global.intNumberOfLogins & ", which is not valid" & VbCr & "Exiting Test .....", 500
+        Runner.Stop (True)
+    End If
+    
+    If Global.intNumberOfLogins > intRecordCount Then
+      logMessage "Fail", "Number of Logins", "Number of logins requested: " & Global.intNumberOfLogins & VbCr & "number of records in Database: " _
+        & intRecordCount & VbCr & "Exiting Test .....", 500
+      Runner.Stop (True)
+      
+      Else
+      For i = 1 To intiValue
+        If i = intiValue Then
+          Global.strUserName = dbRecordSet("UserName").Value
+          Global.strPassword = dbRecordSet("Password").Value
+          Global.strMiddleName = dbRecordSet("MiddleName").Value
+          Global.strHighSchool = dbRecordSet("HighSchool").Value
+          Global.strSecurityQuestion3 = dbRecordSet("SecurityQ3").Value
+          Global.strSecurityQuestion4 = dbRecordSet("SecurityQ4").Value
+          
+          Else
+          dbRecordSet.MoveNext
+        End If
+      Next
+    End If
+  End If
+
+  Set dbRecordSet = Nothing
+End Sub

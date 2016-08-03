@@ -1,0 +1,22 @@
+﻿'USEUNIT Common
+
+Sub Test
+  sqlLogins = "select * from Login"
+  Set dbRecordSet = fetchInputDataByQuery (sqlLogins)
+  i = 0
+  Do While Not dbRecordSet.EOF
+    i = i + 1
+    strUserName = dbRecordSet("UserName").Value
+    strPassword = dbRecordSet("Password").Value
+    strSecurityQuestion1 = dbRecordSet("SecurityQ1").Value
+    strSecurityQuestion2 = dbRecordSet("SecurityQ2").Value
+    strSecurityQuestion3 = dbRecordSet("SecurityQ3").Value
+    strSecurityQuestion4 = dbRecordSet("SecurityQ4").Value
+    
+    MsgBox "i Value: " & i & vbCr & "User Name: " & strUserName & vbCr & "Password: " & strPassword & vbCr & "Security 1: " & strSecurityQuestion1 _
+    & vbCr & "Security 2: & strSecurityQuestion2" & vbCr & "Security 3: " & strSecurityQuestion3 & vbCr & "Security 4: " & strSecurityQuestion4
+    dbRecordSet.MoveNext
+  Loop
+
+  Set dbRecordSet = Nothing
+End Sub

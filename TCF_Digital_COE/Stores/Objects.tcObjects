@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root signature="{30501691-969F-4007-923F-BA4459E51E6A}" version="12.0">
+	<children>
+		<child name="TCF_Logo" key="{624EBB82-640E-4E59-9761-372DB2D7F81C}" type="Object" typeId="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" pluginName="Stores">
+			<data signature="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" version="12.0" caption="TCF_Logo" ID="{624EBB82-640E-4E59-9761-372DB2D7F81C}" FileName="Objects\TCF_Logo.tcObject" Update="False" />
+		</child>
+		<child name="UserId" key="{123FAE4E-1DFA-4AC3-91C4-52DAE8FEA80D}" type="Object" typeId="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" pluginName="Stores">
+			<data signature="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" version="12.0" caption="UserId" ID="{123FAE4E-1DFA-4AC3-91C4-52DAE8FEA80D}" FileName="Objects\UserId.tcObject" Update="False" />
+		</child>
+		<child name="Password" key="{6E832E9E-D80E-4872-9C0A-3052CD22B427}" type="Object" typeId="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" pluginName="Stores">
+			<data signature="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" version="12.0" caption="Password" ID="{6E832E9E-D80E-4872-9C0A-3052CD22B427}" FileName="Objects\Password.tcObject" Update="False" />
+		</child>
+		<child name="Save_User" key="{29C1F12E-F66C-42BD-9D28-7301E3456D7A}" type="Object" typeId="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" pluginName="Stores">
+			<data signature="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" version="12.0" caption="Save_User" ID="{29C1F12E-F66C-42BD-9D28-7301E3456D7A}" FileName="Objects\Save_User.tcObject" Update="False" />
+		</child>
+		<child name="Submit" key="{7D3E6A62-348F-42F0-B360-A134F9708E05}" type="Object" typeId="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" pluginName="Stores">
+			<data signature="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" version="12.0" caption="Submit" ID="{7D3E6A62-348F-42F0-B360-A134F9708E05}" FileName="Objects\Submit.tcObject" Update="False" />
+		</child>
+		<child name="My_Bank_Account" key="{1CD0165F-A894-4C2A-8D8F-F6C81A7B5F05}" type="Object" typeId="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" pluginName="Stores">
+			<data signature="{5EFCFFBB-0DF6-45A2-ADB2-4FD0BF2A280B}" version="12.0" caption="My_Bank_Account" ID="{1CD0165F-A894-4C2A-8D8F-F6C81A7B5F05}" FileName="Objects\My_Bank_Account.tcObject" Update="False" />
+		</child>
+	</children>
+	<folders />
+</Root>

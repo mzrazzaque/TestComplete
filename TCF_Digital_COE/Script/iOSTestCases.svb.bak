@@ -1,0 +1,38 @@
+﻿'USEUNIT Global
+'USEUNIT Common
+'USEUNIT iOSFunctions
+
+' ##############################################################################################
+' ####	Copyright: 2016 TCF Bank
+' ####
+' ####	File Name: iOSTestCases
+' ####	Test Script Name: mobileLogin
+' ####	Purpose: This file is the home of all mobile iOS Test Cases
+' ####
+' ####	Created on: June 30, 2016
+' ####	Created by: Mohammed Razzaque & Shreekumar Raghavan
+' ##############################################################################################
+
+
+Sub mobileLogin
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice    
+  
+  ' App Version
+  captureAppDeviceOSInfo  
+  
+  ' Login
+  loginUser
+  securityAnswer
+  scrapeAccountTotals
+  clickOnNavToggle
+  
+  ' Logout from App Under Test
+  logoutUser 
+    
+  ' Email Results
+  emailTestResults
+  
+  ' Close App Under Test and Cleanup
+  cleanUp 
+End Sub

@@ -1,0 +1,219 @@
+﻿'USEUNIT Global
+
+' ##############################################################################################
+' ####	Copyright: 2016 TCF Bank
+' ####
+' ####	File Name: Common
+' ####	Test Script Name: emailTestResults, logMessage, verifyAndLogObjectsExists, waitFor,
+' ####  waitForLoadingObject
+' ####	Purpose: This file is the home of all reusable subs & functions
+' ####
+' ####	Created on: June 30, 2016
+' ####	Created by: Mohammed Razzaque & Shreekumar Raghavan
+' ##############################################################################################
+
+
+Public Sub emailTestResults
+  On Error Resume Next
+  Global.functionname = "emailFilingEngineResults"
+
+  ' Saving Test Results
+  Log.SaveToDisk
+  WaitFor (2)
+  
+  ' Reading from Test Results
+  Dim xDoc 
+  Set xDoc = CreateObject("Microsoft.XMLDOM") 
+  xDoc.async = False
+
+  While xDoc.load (Log.Path & "Description.tcLog") = False
+    aqutils.Delay (1000)
+  Wend
+
+  strMachineName = xDoc.selectSingleNode("Nodes/Node[@name='root']/Prp[@name='computer name']/@value").text
+  intWarningCount = xDoc.selectSingleNode("Nodes/Node[@name='root']/Prp[@name='warning count']/@value").text
+  intErrorCount = xDoc.selectSingleNode("Nodes/Node[@name='root']/Prp[@name='error count']/@value").text
+
+  ' Get Test Suite Info
+  strTestSuiteName = Project.TestItems.Current.Parent.Name
+  intTestSuiteTestCount = Project.TestItems.Current.Parent.ItemCount
+  intActiveTest = 0
+
+  For i = 0 To intTestSuiteTestCount - 1
+    isEnable = Project.TestItems.Current.Parent.TestItem(i).Enabled
+    If isEnable Then
+      intActiveTest = intActiveTest + 1
+    End If
+  Next
+
+  ' Export Test Results as .mht
+  Err.Clear
+  exportStatus = False
+  strTemp = Replace(Replace(Replace(aqDateTime.Today() &" " & aqDateTime.Time, "/", "-"), " ", " "), ":", "-")
+'  Global.strLogFileName = UCase(Global.strRunenv) & "_" & strTemp & "_" & strTestSuiteName & Global.strFileExtension
+  Global.strLogFileName = strTestSuiteName & " " & strTemp & Global.strFileExtension
+  Log.SaveResultsAs Global.strAppResultsPath & "\" & Global.strLogFileName, 2
+
+  If (Err.Number <> 0) Then
+    logMessage "Fail", "Results Export Status", "Results Export FAILED", 100
+  Else
+    exportStatus = True
+    logMessage "Pass", "Results Export Status", "Results Export FAILED", 100
+  End If
+
+  Set outObj = CreateObject("Outlook.Application")
+  Set mailObj = outObj.CreateItem(0)
+
+  mailObj.To = Global.strEmailAddress
+
+  strTestResults = ""
+  If intErrorCount > 0 Then
+    strTestResults = "FAILED"
+    intErrorCount = intErrorCount - 1
+  Else
+    strTestResults = "Passed"
+  End If
+
+  mailObj.Subject = strTestSuiteName & " Results - " & strTestResults & " in " & UCase(Global.strRunenv) & " Environment"
+  mailBody = "Test Machine Name:" & vbTab & strMachineName _
+      & VbCr & "App Environment:" & vbTab & UCase(Global.strRunenv) & VbCr & "Application Version:" & vbTab _
+      & Global.strAppVersion & VbCr & "Test Suite Name:" & vbTab & strTestSuiteName & VbCr & VbCr & "# of Test Cases in Test " _
+      & "Suite:" & vbTab & intTestSuiteTestCount & VbCr & "# of Test Cases Executed:" & vbTab & intActiveTest & VbCr _
+      & "Total Fail Count:" & vbTab & intErrorCount & VbCr & "Total Warning Count:" & vbTab & intWarningCount & VbCr & VbCr _
+      & "Please see attachment for detail test results." & VbCr & "Thank you."
+
+  If exportStatus Then
+    mailObj.Body = mailBody
+    mailObj.Attachments.Add Global.strAppResultsPath & "\" & Global.strLogFileName
+  Else
+    mailObj.Body = mailBody & VbCr & VbCr & "PS: Attachment unavailable"
+  End If
+
+  mailObj.Send
+  Log.Event "Email Sent", "Email Delivered!", 100
+
+  Set outObj = Nothing
+  Set mailObj = Nothing
+  Set xDoc = Nothing
+End Sub
+
+' Log Messages in Test Results
+Public Sub logMessage (strStatus, str1, str2, intPriority)
+  On Error Resume Next
+  Set attr = Log.CreateNewAttributes
+  If UCase(strStatus) = "PASS" Then    
+    attr.FontColor = RGB(0, 0, 255)
+    Log.Checkpoint str1, str2, intPriority, attr
+    
+    ElseIf UCase(strStatus) = "FAIL" Then
+    attr.FontColor = RGB(255,0,0)
+    attr.Bold = True
+    Log.Error str1, str2, intPriority, attr
+    
+    ElseIf UCase(strStatus) = "WARNING" Then
+    attr.FontColor = RGB(18, 0, 58)
+    attr.Bold = True
+    Log.Warning str1, str2, intPriority, attr
+    
+    ElseIf UCase(strStatus) = "INFO" Then
+    attr.FontColor = RGB(41, 137, 0)
+    attr.Bold = True
+    Log.Event str1, str2, intPriority, attr
+    
+    Else
+    attr.FontColor = RGB(0, 0, 0)
+    Log.Event str1, str2, intPriority, attr
+  End If
+
+  Set attr = Nothing
+End Sub
+
+' Wait
+Public Sub waitFor (intSeconds)
+  On Error Resume Next
+  aqutils.Delay (intSeconds * 1000)
+End Sub
+
+' Wait For Loading Object
+Public Function waitForLoadingObject (strObjectName, objObject, propertyName, propertyValue)
+  On Error Resume Next
+  Dim timeInSeconds, pageLoadStatus
+  pageLoadStatus = True
+  timeInSeconds = 0
+  
+  Do While objObject.FindChild(propertyName, propertyValue, 30).Exists = False
+    waitFor (1)
+    timeInSeconds = timeInSeconds + 1
+    
+    If timeInSeconds > 30 Then
+      logMessage "Fail", strPageName & " Page Load Status", strObjectName & " page did not load in " & timeInSeconds & " seconds" _
+        &VbCr & "Aborting Test Run", 500
+      pageLoadStatus = False
+      Runner.Stop(True)
+      Exit Do
+    End If
+  Loop
+  
+  waitForLoadingObject = pageLoadStatus
+End Function
+
+' Verify Objects Under Test
+Public Sub verifyAndLogObjectsExists(propertyName, propertyVal, msgTitle)
+  If objMobileApp.FindChild (propertyName, propertyVal, 30).Exists Then
+    logMessage "Pass", msgTitle, msgTitle & " exists", 100
+    Else
+    logMessage "Fail",  msgTitle, msgTitle & " does not exist", 300
+  End If
+End Sub
+
+Sub watchStart
+  On Error Resume Next
+  Set objStopWatch = HISUtils.StopWatch
+  ' Starts the time counter
+  objStopWatch.Reset
+  objStopWatch.Start
+  ' Posts the passed time to the test log
+End Sub
+
+Sub watchStop(transactionName)
+  On Error Resume Next
+  Dim sqlInsertResponseTimes
+  'Stops the time counter
+  objStopWatch.Stop  
+  
+  ' Posts the passed time to the test log
+  Log.Event (transactionName & ": Execution time: " & objStopWatch.ToString)
+  
+  sqlInsertResponseTimes = "INSERT INTO ResponseTimes " _
+  & "( RunEnv, DeviceType, DeviceOS, DeviceOSVersion, TransactionName, ResponseTime, MBBuildNumber, WindowsUser, MachineName ) " _
+  & "VALUES ('" &  Global.strRunenv & "','" & Global.strDeviceType & "','" & Global.strAppOS & "','" & Global.strAppOSVersion _
+  & "','" & transactionName & "','" & objStopWatch.ToString & "','" & Global.strAppVersion & "','" &  sys.UserName & "','" _
+  & sys.HostName & "')"
+
+  fetchInputDataByQuery (sqlInsertResponseTimes)
+End Sub
+
+' Database Connection
+Public Function fetchInputDataByQuery (queryText)
+  On Error Resume Next 
+  Dim executeFunction
+  Set objConnection = CreateObject("ADODB.Connection") 
+  Set objRecordSet = CreateObject("ADODB.Recordset") 
+  
+  ' This section is for counting number of rows
+  objRecordSet.CursorType = adOpenStatic
+
+  objConnection.Open "TCF"
+  objRecordSet.Open queryText ,objConnection  
+  
+  If (Err.Number <> 0) Then
+    Log.Message queryText
+    Log.Message Err.Number
+    Log.Message Err.Description
+    Log.Error "Connection to database FAILED", 500
+  End If  
+  
+  Set fetchInputDataByQuery = objRecordSet
+  Set objConnection = Nothing
+  Set objRecordSet = Nothing  
+End Function
