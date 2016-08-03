@@ -22,6 +22,7 @@ Sub mobileLogin
   captureAppDeviceOSInfo  
   
   ' Login
+  generateRandomNumber 1, 4
   For i = 1 To Global.intNumberOfLogins
     loginUser (i)
     securityAnswer

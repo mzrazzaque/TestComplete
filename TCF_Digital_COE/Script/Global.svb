@@ -32,6 +32,7 @@ strTestcasename = ""
 strAppOS = ""
 strAppOSVersion = ""
 strDeviceType = ""
+strBrowserName = "Internet Explorer"
 
 ' Global Datatype - String Arrays
 

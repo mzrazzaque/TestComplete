@@ -18,11 +18,11 @@ Public Sub initDevice
   If Mobile.Device("*", 1).Exists Then
     'Connecting to Mobile
     Mobile.SetCurrent("*")
-'    If(TestedApps.TCF_iOS.Run)Then    
-'      Else
-'      logMessage "FAIL", "Application executable", "Application executable not found" & VbCr & "Exiting Test ...", 500
-'      Runner.Stop (True)
-'    End If  
+    If(TestedApps.TCF_iOS.Run)Then    
+      Else
+      logMessage "FAIL", "Application executable", "Application executable not found" & VbCr & "Exiting Test ...", 500
+      Runner.Stop (True)
+    End If  
     Mobile.Device("*").Process("TCF Bank").WaitChild "Exists",10000
     ' Creating TCF App object
     Set Global.objMobileApp = Mobile.Device("*").Process("TCF Bank")        
