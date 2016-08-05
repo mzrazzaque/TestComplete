@@ -1,0 +1,120 @@
+﻿'USEUNIT Global
+'USEUNIT Common
+
+' ##############################################################################################
+' ####	Copyright: 2016 TCF Bank
+' ####
+' ####	File Name: OnlineFunctions
+' ####	Function Names: initDevice, cleanUp, captureAppVersion, loginUser, securityAnswer,
+' ####  logoutUser
+' ####	Purpose: This file is the home of all reusable subs & functions
+' ####
+' ####	Created on: August 04, 2016
+' ####	Created by: Mohammed Razzaque & Shreekumar Raghavan
+' ##############################################################################################
+
+
+' Capture Machine, Browser and OS Info
+Public Sub capturemachineBrowserOSInfo ()
+'  waitForLoadingObject "TCF Logo", objLoginPage, "className", "col-xs-4 logo-image"  
+  ' Cappture App Version
+'  strAppVer = objLoginPage.FindChild("className", "appVersion", 30).innerText
+  Global.strAppVersion = "Not Available"
+  logMessage "INFO", "App Version", Global.strAppVersion, 100
+
+  ' Device and OS
+  Global.strDeviceType = Sys.HostName
+  Global.strAppOS = Sys.OSInfo.FullName
+  Global.strAppOSVersion = Sys.OSInfo.Version
+End Sub
+
+' Open Browser and Navigate to Online App
+Public Sub openOnlineApp
+  openBrowserAndNavigate (Global.strOnlineBankingUrl)
+  
+  If Sys.Browser.Page (Global.strOnlineBankingUrl).Exists Then
+    Set objLoginPage = Sys.Browser.Page(Global.strOnlineBankingUrl)
+    waitForLoadingObject "Login Page", objLoginPage, "className", "btn btn-default btn-submit"
+    Else
+    logMessage "FAIL", "Online Login Page", "Online Login page does not exists" & VbCr & "Exiting Test ......", 500
+    Runner.Stop (True)
+  End If
+End Sub
+
+' Online Banking Login
+Public Sub onlineLoginUser (intLoginValue)
+  openOnlineApp
+  logMessage "Info", "Iteration Number: " & intLoginValue, "Iteration Number " & intLoginValue & " of " & Global.intNumberOfLogins, 100
+  numberOfLogins (intLoginValue)
+  
+  ' Verify Online Page TCF Logo
+  verifyAndLogObjectsExists objLoginPage, "className", "col-xs-4 logo-image", "TCF Logo"
+  ' Verify Online Page User Name Label
+  verifyAndLogObjectsExists objLoginPage, "htmlFor", "challengeUsername", "User Name Field Label"
+  ' Verify Online Page User Name Field
+  verifyAndLogObjectsExists objLoginPage, "objectIdentifier", "challengeUsername", "User Name Field"
+  ' Verify Online Page Password Label
+  verifyAndLogObjectsExists objLoginPage, "htmlFor", "challengePassword", "Password Field Label" 
+  ' Verify Online Page Password Field
+  verifyAndLogObjectsExists objLoginPage, "objectIdentifier", "challengePassword", "Password Field"    
+  ' Verify Online Page Forgot Your Password Link
+  verifyAndLogObjectsExists objLoginPage, "className", "forgot-password btn-link", "Forgot Password Link"    
+  ' Verify Online Page Submit Button
+  verifyAndLogObjectsExists objLoginPage, "className", "btn btn-default btn-submit", "LogIn Submit Button"
+  
+  ' Login
+  objLoginPage.FindChild ("objectIdentifier", "challengeUsername", 30).Text = Global.strUserName
+  objLoginPage.FindChild ("objectIdentifier", "challengePassword", 30).Text = Global.strPassword
+  
+  watchStart
+  objLoginPage.FindChild ("className", "btn btn-default btn-submit", 30).Click  
+  waitForLoadingObject "Secret Question Page", objLoginPage, "objectIdentifier", "secretQuestion" 
+  watchStop("Online Login")
+End Sub
+
+'  Online Security Question Answer
+Public Sub onlineSecurityAnswer()
+  ' Selecting Security Question
+  Dim securityAnswer
+  securityAnswer = ""
+  strSecurityQuestionName = objLoginPage.FindChild ("objectIdentifier", "secretQuestion", 30).innerText
+  If stringExist (strSecurityQuestionName, "high school") Then
+    securityAnswer = Global.strHighSchool
+    ElseIf stringExist (strSecurityQuestionName, "middle name") Then
+    securityAnswer = Global.strMiddleName
+    ElseIf stringExist (strSecurityQuestionName, "grandmother") Then
+    securityAnswer = Global.strGrandMother
+  End If
+    
+  ' Verify Secret Question Field label
+  verifyAndLogObjectsExists objLoginPage, "objectIdentifier", "secretQuestion", "Secret Question Answer field"
+  ' Verify Secret Question Answer Field
+  verifyAndLogObjectsExists objLoginPage, "objectIdentifier", "secretQuestionAnswer", "Secret Question Answer field"
+  ' Verify Cancel Button
+  verifyAndLogObjectsExists objLoginPage, "className", "btn btn-default btn-cancel", "Cancel Button"
+  ' Verify Submit Button
+  verifyAndLogObjectsExists objLoginPage, "className", "btn btn-default btn-submit", "Secret Question Submit Button" 
+    
+  ' Enter Secret Question Answer and Submit
+  objLoginPage.FindChild("objectIdentifier", "secretQuestionAnswer", 30).SetText(securityAnswer)
+  watchStart
+  objLoginPage.FindChild ("className", "btn btn-default btn-submit", 30).ClickButton    
+  waitForLoadingObject "Accounts", objLoginPage, "className", "accounts internal-accounts"
+  watchStop("Online Security Answer")
+  
+  ' Verify Login
+  verifyAndLogObjectsExists objLoginPage, "namePropStr", "#logout", "Verify Online Login"
+End Sub
+
+' Online Logout
+Public Sub onlineLogoutUser ()
+  ' Click Logout Link
+  watchStart
+  objLoginPage.FindChild ("namePropStr", "#logout", 30).Click
+  waitForLoadingObject "Login Page", objLoginPage, "className", "btn btn-default btn-submit"
+  watchStop("Online Logout")
+  
+  ' Verify Logout
+  verifyAndLogObjectsExists objLoginPage, "className", "btn btn-default btn-submit", "Logout Sucessful"  
+End Sub
+

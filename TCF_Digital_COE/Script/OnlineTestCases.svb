@@ -1,6 +1,6 @@
 ﻿'USEUNIT Global
 'USEUNIT Common
-'USEUNIT iOSFunctions
+'USEUNIT OnlineFunctions
 
 ' ##############################################################################################
 ' ####	Copyright: 2016 TCF Bank
@@ -9,33 +9,21 @@
 ' ####	Test Script Name: mobileLogin
 ' ####	Purpose: This file is the home of all mobile iOS Test Cases
 ' ####
-' ####	Created on: June 30, 2016
+' ####	Created on: August 04, 2016
 ' ####	Created by: Mohammed Razzaque & Shreekumar Raghavan
 ' ##############################################################################################
 
 
-Sub mobileLogin
-  ' Initialize Devices, Install and Run App Under Test
-  initDevice    
-  
-  ' App Version
-  captureAppDeviceOSInfo  
+Public Sub onlineLogin  
+  ' Capture Version & Sustem Info
+  capturemachineBrowserOSInfo
   
   ' Login
   generateRandomNumber 4, 1
   For i = 1 To Global.intNumberOfLogins
-    loginUser (i)
-    securityAnswer
-    scrapeAccountTotals
-    clickOnNavToggle
-  
-    ' Logout from App Under Test
-    logoutUser
+    onlineLoginUser (i)
+    onlineSecurityAnswer
+    onlineLogoutUser
+    closeBrowsers
   Next
-    
-  ' Email Results
-  emailTestResults
-  
-  ' Close App Under Test and Cleanup
-  cleanUp 
 End Sub

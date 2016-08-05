@@ -54,15 +54,15 @@ End Sub
 Public Sub loginUser (intLoginValue)
   numberOfLogins (intLoginValue)
   ' Verify TCF Logo
-  verifyAndLogObjectsExists "className", "header-logo", "TCF Logo"
+  verifyAndLogObjectsExists objMobileApp, "className", "header-logo", "TCF Logo"
   ' Verify User Name Field
-  verifyAndLogObjectsExists "objectIdentifier", "challengeUsername", "User Name Field"
+  verifyAndLogObjectsExists objMobileApp, "objectIdentifier", "challengeUsername", "User Name Field"
   ' Verify Password Field
-  verifyAndLogObjectsExists "objectIdentifier", "challengePassword", "Password Field"    
+  verifyAndLogObjectsExists objMobileApp, "objectIdentifier", "challengePassword", "Password Field"    
   ' Verify Save Username Checkbox
-  verifyAndLogObjectsExists "objectIdentifier", "isUsernameSaved", "Save Username CheckBox"    
+  verifyAndLogObjectsExists objMobileApp, "objectIdentifier", "isUsernameSaved", "Save Username CheckBox"    
   ' Verify Submit Button
-  verifyAndLogObjectsExists "className", "btn btn-default btn-submit", "LogIn Submit Button"
+  verifyAndLogObjectsExists objMobileApp, "className", "btn btn-default btn-submit", "LogIn Submit Button"
         
   ' Login
   objMobileApp.FindChild ("objectIdentifier", "challengeUsername", 30).SetText(Global.strUserName)  
@@ -70,7 +70,7 @@ Public Sub loginUser (intLoginValue)
   watchStart
   objMobileApp.FindChild ("className", "btn btn-default btn-submit", 30).ClickButton  
   waitForLoadingObject "Secret Answer", objMobileApp, "objectIdentifier", "secretQuestionAnswer"
-  watchStop("mobileLogin")
+  watchStop("Mobile Login")
 End Sub
 
 Public Sub securityAnswer
@@ -87,11 +87,11 @@ Public Sub securityAnswer
   End If
     
   ' Verify Secret Question Answer Field
-  verifyAndLogObjectsExists "objectIdentifier", "secretQuestionAnswer", "Secret Question Answer field"
+  verifyAndLogObjectsExists objMobileApp, "objectIdentifier", "secretQuestionAnswer", "Secret Question Answer field"
   ' Verify Submit Button
-  verifyAndLogObjectsExists "className", "btn btn-default btn-submit", "Secret Question Submit Button" 
+  verifyAndLogObjectsExists objMobileApp, "className", "btn btn-default btn-submit", "Secret Question Submit Button" 
   ' Verify Cancel Button
-  verifyAndLogObjectsExists "className", "btn btn-default btn-cancel visible-xs", "Cancel Button"
+  verifyAndLogObjectsExists objMobileApp, "className", "btn btn-default btn-cancel visible-xs", "Cancel Button"
     
   ' Enter Secret Question Answer and Submit
   objMobileApp.FindChild("objectIdentifier", "secretQuestionAnswer", 30).SetText(securityAnswer)
@@ -99,16 +99,17 @@ Public Sub securityAnswer
   objMobileApp.FindChild ("className", "btn btn-default btn-submit", 30).ClickButton    
   waitForLoadingObject "Accounts", objMobileApp, "className", "accounts internal-accounts"
   watchStop("mobileSecurityAnswer")
+  
   ' Verify Login
-  verifyAndLogObjectsExists "className", "accounts internal-accounts", "LogIn Verify"
+  verifyAndLogObjectsExists objMobileApp, "className", "accounts internal-accounts", "LogIn Verify"
   ' Verify Networth
-  verifyAndLogObjectsExists "className", "status-bar highlight networth", "Networth Frame"    
+  verifyAndLogObjectsExists objMobileApp, "className", "status-bar highlight networth", "Networth Frame"    
   ' Verify Quick Pay
-  verifyAndLogObjectsExists "Name", "Link(0)", "Networth Link"
+  verifyAndLogObjectsExists objMobileApp, "Name", "Link(0)", "Networth Link"
   ' Verify Transfer Now
-  verifyAndLogObjectsExists "Name", "Link(1)", "Transfer Link"
+  verifyAndLogObjectsExists objMobileApp, "Name", "Link(1)", "Transfer Link"
   ' Verify Deposit 
-  verifyAndLogObjectsExists "Name", "Link(2)", "Deposit Link" 
+  verifyAndLogObjectsExists objMobileApp, "Name", "Link(2)", "Deposit Link" 
 End Sub
 
 Public Sub scrapeAccountTotals
@@ -206,61 +207,20 @@ End Sub
 
 Public Sub clickOnNavToggle 
   ' Verify Menu Navigation
-  verifyAndLogObjectsExists "className", "col-xs-3 nav-toggle", "Menu Navigation"
+  verifyAndLogObjectsExists objMobileApp, "className", "col-xs-3 nav-toggle", "Menu Navigation"
   objMobileApp.FindChild("className", "col-xs-3 nav-toggle", 30).Click
 End Sub
 
 Public Sub logoutUser
   ' Verify Logout Menu Object and click Logout
   waitForLoadingObject "DashBoard", objMobileApp, "classname", "glyphicon glyphicon-off"
-  verifyAndLogObjectsExists "namePropStr", "cordova.html#logout", "LogOut"
+  verifyAndLogObjectsExists objMobileApp, "namePropStr", "cordova.html#logout", "LogOut"
   
   watchStart
   objMobileApp.FindChild ("classname", "glyphicon glyphicon-off", 30).Click
   waitForLoadingObject "Logout", objMobileApp, "objectIdentifier", "challengeUsername"
-  watchStop("mobileLogOut")
+  watchStop("Mobile LogOut")
   
   ' Verify Logout
-  verifyAndLogObjectsExists "objectIdentifier", "challengeUsername", "LogOut Sucessful"  
-End Sub
-
-' Selecting Users for Login
-public Sub numberOfLogins (intiValue)
-  sqlLogins = "select * from Login"
-  Set dbRecordSet = fetchInputDataByQuery (sqlLogins)
-  dbRecordSet.MoveFirst
-
-  If dbRecordSet.EOF And dbRecordSet.BOF Then
-    logMessage "Fail", "Number of Records Fetched from DB", "No records found", 500
-    Else
-    intRecordCount = dbRecordSet.RecordCount
-    
-    If Global.intNumberOfLogins <= 0 Then
-      logMessage "Fail", "Number of Logins", "Number of logins requested: " & Global.intNumberOfLogins & ", which is not valid" & VbCr & "Exiting Test .....", 500
-        Runner.Stop (True)
-    End If
-    
-    If Global.intNumberOfLogins > intRecordCount Then
-      logMessage "Fail", "Number of Logins", "Number of logins requested: " & Global.intNumberOfLogins & VbCr & "number of records in Database: " _
-        & intRecordCount & VbCr & "Exiting Test .....", 500
-      Runner.Stop (True)
-      
-      Else
-      For i = 1 To intiValue
-        If i = intiValue Then
-          Global.strUserName = dbRecordSet("UserName").Value
-          Global.strPassword = dbRecordSet("Password").Value
-          Global.strMiddleName = dbRecordSet("MiddleName").Value
-          Global.strHighSchool = dbRecordSet("HighSchool").Value
-          Global.strGrandMother = dbRecordSet("GrandMother").Value
-          Global.strSecurityQuestion4 = dbRecordSet("SecurityQ4").Value
-          
-          Else
-          dbRecordSet.MoveNext
-        End If
-      Next
-    End If
-  End If
-
-  Set dbRecordSet = Nothing
+  verifyAndLogObjectsExists objMobileApp, "objectIdentifier", "challengeUsername", "LogOut Sucessful"  
 End Sub

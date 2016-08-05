@@ -158,11 +158,11 @@ Public Function waitForLoadingObject (strObjectName, objObject, propertyName, pr
 End Function
 
 ' Verify Objects Under Test
-Public Sub verifyAndLogObjectsExists(propertyName, propertyVal, msgTitle)
-  If objMobileApp.FindChild (propertyName, propertyVal, 30).Exists Then
-    logMessage "Pass", msgTitle, msgTitle & " exists", 100
+Public Sub verifyAndLogObjectsExists (objObject, strPropName, strPropVal, strMsgTitle)
+  If objObject.FindChild (strPropName, strPropVal, 30).Exists Then
+    logMessage "Pass", strMsgTitle, strMsgTitle & " exists", 100
     Else
-    logMessage "Fail",  msgTitle, msgTitle & " does not exist", 300
+    logMessage "Fail",  strMsgTitle, strMsgTitle & " does not exist", 300
   End If
 End Sub
 
@@ -175,19 +175,19 @@ Sub watchStart
   ' Posts the passed time to the test log
 End Sub
 
-Sub watchStop(transactionName)
+Sub watchStop(strTransactionName)
   On Error Resume Next
   Dim sqlInsertResponseTimes
   'Stops the time counter
   objStopWatch.Stop  
   
   ' Posts the passed time to the test log
-  Log.Event (transactionName & ": Execution time: " & objStopWatch.ToString)
+  logMessage "Info", strTransactionName & ": Execution Time", strTransactionName & ": Execution time: " & objStopWatch.ToString, 100
   
   sqlInsertResponseTimes = "INSERT INTO ResponseTimes " _
   & "( RunEnv, DeviceType, DeviceOS, DeviceOSVersion, TransactionName, ResponseTime, MBBuildNumber, WindowsUser, MachineName ) " _
   & "VALUES ('" &  Global.strRunenv & "','" & Global.strDeviceType & "','" & Global.strAppOS & "','" & Global.strAppOSVersion _
-  & "','" & transactionName & "','" & objStopWatch.ToString & "','" & Global.strAppVersion & "','" &  sys.UserName & "','" _
+  & "','" & strTransactionName & "','" & objStopWatch.ToString & "','" & Global.strAppVersion & "','" &  sys.UserName & "','" _
   & sys.HostName & "')"
 
   fetchInputDataByQuery (sqlInsertResponseTimes)
@@ -232,6 +232,9 @@ End Function
 
 ' Open specific website with Internet Explorer Browser
 Public Function openBrowserAndNavigate(strURL)
+  closeBrowsers
+  forceClearIECache
+  
   On Error Resume Next
   Dim IE
   Set IE = CreateObject("InternetExplorer.Application")
@@ -246,6 +249,7 @@ Public Function openBrowserAndNavigate(strURL)
     getBrowserName
     If Global.strBrowserName = "Internet Explorer" Then
       getIeVersion
+      setIERegistrySettings (True)
     End If
     
     Else
@@ -272,11 +276,21 @@ Sub getIeVersion
   strValueName = "svcVersion"
   oReg.GetStringValue HKEY_LOCAL_MACHINE,strKeyPath,strValueName,strValue
   strValueArray = split(strValue, ".")
-  Global.browserVersion = strValueArray(0) & "." & strValueArray(1)  
+  Global.strBrowserVersion = strValueArray(0) & "." & strValueArray(1)  
 
   Set oReg = Nothing
 End Sub
 
+' Closing all browsers
+Public Sub closeBrowsers
+  On Error Resume Next
+  terminateProcess ("iexplore")
+  terminateProcess ("chrome")
+  terminateProcess ("firefox")
+  setIERegistrySettings (False)
+End Sub
+
+' Closing Specific Browser
 Public Sub browserToClose (strBrowserTitle)
 	On Error Resume Next
 	dim objShell, objWindow, strOrigBrowserTitle
@@ -306,6 +320,7 @@ Public Sub browserToClose (strBrowserTitle)
 
 	terminateProcess ("chrome")
   terminateProcess ("firefox")
+  setIERegistrySettings (False)
   
   set objShell = Nothing
 End Sub
@@ -385,13 +400,13 @@ Public Sub getBrowserName
   
   For Each objProcess in colProcessList 
     If stringExist(objProcess.Name, "Firefox") Then
-      Global.browserName = "FireFox"
+      Global.strBrowserName = "FireFox"
       Exit For
       ElseIf stringExist(objProcess.Name, "Chrome") Then
-      Global.browserName = "Google Chrome"
+      Global.strBrowserName = "Google Chrome"
       Exit For
       ElseIf stringExist(objProcess.Name, "iexplore") Then
-      Global.browserName = "Internet Explorer"
+      Global.strBrowserName = "Internet Explorer"
       Exit For
       Else
       logMeggage "Warning", "Browser Name", "Unknown", 100
@@ -567,3 +582,43 @@ Public Function findProcess (strProcessName)
   findProcess = boolTrue
 End Function
 
+' Selecting Users for Login
+public Sub numberOfLogins (intiValue)
+  sqlLogins = "select * from Login"
+  Set dbRecordSet = fetchInputDataByQuery (sqlLogins)
+  dbRecordSet.MoveFirst
+
+  If dbRecordSet.EOF And dbRecordSet.BOF Then
+    logMessage "Fail", "Number of Records Fetched from DB", "No records found", 500
+    Else
+    intRecordCount = dbRecordSet.RecordCount
+    
+    If Global.intNumberOfLogins <= 0 Then
+      logMessage "Fail", "Number of Logins", "Number of logins requested: " & Global.intNumberOfLogins & ", which is not valid" & VbCr & "Exiting Test .....", 500
+        Runner.Stop (True)
+    End If
+    
+    If Global.intNumberOfLogins > intRecordCount Then
+      logMessage "Fail", "Number of Logins", "Number of logins requested: " & Global.intNumberOfLogins & VbCr & "number of records in Database: " _
+        & intRecordCount & VbCr & "Exiting Test .....", 500
+      Runner.Stop (True)
+      
+      Else
+      For i = 1 To intiValue
+        If i = intiValue Then
+          Global.strUserName = dbRecordSet("UserName").Value
+          Global.strPassword = dbRecordSet("Password").Value
+          Global.strMiddleName = dbRecordSet("MiddleName").Value
+          Global.strHighSchool = dbRecordSet("HighSchool").Value
+          Global.strGrandMother = dbRecordSet("GrandMother").Value
+          Global.strSecurityQuestion4 = dbRecordSet("SecurityQ4").Value
+          
+          Else
+          dbRecordSet.MoveNext
+        End If
+      Next
+    End If
+  End If
+
+  Set dbRecordSet = Nothing
+End Sub
