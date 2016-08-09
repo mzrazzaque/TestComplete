@@ -23,6 +23,7 @@ Public Sub onlineLogin
   For i = 1 To Global.intNumberOfLogins
     onlineLoginUser (i)
     onlineSecurityAnswer
+    verifyAccounts
     onlineLogoutUser
     closeBrowsers
   Next

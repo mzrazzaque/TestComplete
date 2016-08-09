@@ -22,13 +22,16 @@ Sub mobileLogin
   captureAppDeviceOSInfo  
   
   ' Login
-  loginUser
-  securityAnswer
-  scrapeAccountTotals
-  clickOnNavToggle
+  generateRandomNumber 4, 1
+  For i = 1 To Global.intNumberOfLogins
+    loginUser (i)
+    securityAnswer
+    scrapeAccountTotals
+    clickOnNavToggle
   
-  ' Logout from App Under Test
-  logoutUser 
+    ' Logout from App Under Test
+    logoutUser
+  Next
     
   ' Email Results
   emailTestResults

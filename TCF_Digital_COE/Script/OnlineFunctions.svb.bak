@@ -140,6 +140,7 @@ Public Sub verifyAccounts
   
   ' Verify Balances
   sqlGetBalances = "Select top 1 * from AccountSummary where UserId = '" & strUserName & "' order by DateAndTime desc"
+'  sqlGetBalances = "Select top 1 * from AccountSummary where UserId = 'johnsmith' order by DateAndTime desc"
   Set dbRecordSet = fetchInputDataByQuery (sqlGetBalances)
   
   If Not dbRecordSet.EOF And Not dbRecordSet.BOF Then

@@ -548,7 +548,7 @@ End Function
 ' Verify Results
 Public Function verifyResults(strResultDescription, strExpectedResults, strActualResults)
   On Error Resume Next
-  If (removeSpecialCharacters(expectedRes) = removeSpecialCharacters(actualRes)) Then
+  If (removeSpecialCharacters(strExpectedResults) = removeSpecialCharacters(strActualResults)) Then
     logMessage "Pass", "Verification - " & strResultDescription, "Expected: " & strExpectedResults & VbCr & "Actual: " & strActualResults, 100
     Else
     logMessage "Fail", "Verification - " & strResultDescription, "Expected: " & strExpectedResults & VbCr & "Actual: " & strActualResults, 300
@@ -622,3 +622,18 @@ public Sub numberOfLogins (intiValue)
 
   Set dbRecordSet = Nothing
 End Sub
+
+Public Function removeSpecialCharacters (strString)
+  On Error Resume Next
+'  intAscValue = 0
+  tempStr = ""
+  For i = 0 to Len (strString) - 1
+    intVal = asc(Mid(strString, i+1, 1))
+    charVal = Mid(strString, i+1, 1)
+'    intAscValue = intAscValue + intVal
+    If (intVal > 64 And intVal < 91) Or (intVal > 96 And intVal < 123) Or (intVal > 47 And intVal < 58) Then
+      tempStr = tempStr & charVal
+    End If
+  Next
+  removeSpecialCharacters = tempStr
+End Function

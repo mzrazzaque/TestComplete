@@ -16,6 +16,12 @@
 		<child name="Workspace" key="{DAC03147-D901-4A62-B7C0-BB3669DBA621}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
 			<data path="Workspace.svb" />
 		</child>
+		<child name="OnlineFunctions" key="{38567EEF-7362-4C1F-B1F3-FFCB5FB6C820}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
+			<data path="OnlineFunctions.svb" />
+		</child>
+		<child name="OnlineTestCases" key="{0360F575-5931-4531-B314-AF874BF32589}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
+			<data path="OnlineTestCases.svb" />
+		</child>
 	</children>
 	<folders>
 		<folder caption="Android OS Mobile" description="A logical folder that is used to organize project items and elements." moniker="" />
@@ -25,6 +31,11 @@
 				<ref key="{8B08A193-B17F-44AB-B6DE-01D5B22C3EC3}" />
 			</references>
 		</folder>
-		<folder caption="Online" description="A logical folder that is used to organize project items and elements." moniker="" />
+		<folder caption="Online" description="A logical folder that is used to organize project items and elements." moniker="">
+			<references>
+				<ref key="{38567EEF-7362-4C1F-B1F3-FFCB5FB6C820}" />
+				<ref key="{0360F575-5931-4531-B314-AF874BF32589}" />
+			</references>
+		</folder>
 	</folders>
 </Root>

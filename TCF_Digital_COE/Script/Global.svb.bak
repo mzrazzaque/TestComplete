@@ -12,13 +12,14 @@
 ' Global Objects
 Dim objMobileApp
 Dim objStopWatch
+Dim objLoginPage
 
 ' Global Datatype - Strings
 strUserName = ""
 strPassword = ""
 strMiddleName = ""
 strHighSchool = ""
-strSecurityQuestion3 = ""
+strGrandMother = ""
 strSecurityQuestion4 = ""
 strDeviceName = ""
 strRunenv = "Demo"
@@ -32,6 +33,10 @@ strTestcasename = ""
 strAppOS = ""
 strAppOSVersion = ""
 strDeviceType = ""
+strBrowserName = "Internet Explorer"
+strOnlineBankingUrl = "https://fi1-tcfdemo.dev.d3banking.com/"
+strBrowserName = ""
+strBrowserVersion = ""
 
 ' Global Datatype - String Arrays
 

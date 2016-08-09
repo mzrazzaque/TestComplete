@@ -158,11 +158,11 @@ Public Function waitForLoadingObject (strObjectName, objObject, propertyName, pr
 End Function
 
 ' Verify Objects Under Test
-Public Sub verifyAndLogObjectsExists(propertyName, propertyVal, msgTitle)
-  If objMobileApp.FindChild (propertyName, propertyVal, 30).Exists Then
-    logMessage "Pass", msgTitle, msgTitle & " exists", 100
+Public Sub verifyAndLogObjectsExists (objObject, strPropName, strPropVal, strMsgTitle)
+  If objObject.FindChild (strPropName, strPropVal, 30).Exists Then
+    logMessage "Pass", strMsgTitle, strMsgTitle & " exists", 100
     Else
-    logMessage "Fail",  msgTitle, msgTitle & " does not exist", 300
+    logMessage "Fail",  strMsgTitle, strMsgTitle & " does not exist", 300
   End If
 End Sub
 
@@ -175,19 +175,19 @@ Sub watchStart
   ' Posts the passed time to the test log
 End Sub
 
-Sub watchStop(transactionName)
+Sub watchStop(strTransactionName)
   On Error Resume Next
   Dim sqlInsertResponseTimes
   'Stops the time counter
   objStopWatch.Stop  
   
   ' Posts the passed time to the test log
-  Log.Event (transactionName & ": Execution time: " & objStopWatch.ToString)
+  logMessage "Info", strTransactionName & ": Execution Time", strTransactionName & ": Execution time: " & objStopWatch.ToString, 100
   
   sqlInsertResponseTimes = "INSERT INTO ResponseTimes " _
   & "( RunEnv, DeviceType, DeviceOS, DeviceOSVersion, TransactionName, ResponseTime, MBBuildNumber, WindowsUser, MachineName ) " _
   & "VALUES ('" &  Global.strRunenv & "','" & Global.strDeviceType & "','" & Global.strAppOS & "','" & Global.strAppOSVersion _
-  & "','" & transactionName & "','" & objStopWatch.ToString & "','" & Global.strAppVersion & "','" &  sys.UserName & "','" _
+  & "','" & strTransactionName & "','" & objStopWatch.ToString & "','" & Global.strAppVersion & "','" &  sys.UserName & "','" _
   & sys.HostName & "')"
 
   fetchInputDataByQuery (sqlInsertResponseTimes)
@@ -216,4 +216,424 @@ Public Function fetchInputDataByQuery (queryText)
   Set fetchInputDataByQuery = objRecordSet
   Set objConnection = Nothing
   Set objRecordSet = Nothing  
+End Function
+
+' Verify sub string exists in string
+Public Function stringExist(strString, subString)
+  On Error Resume Next
+  boolExist = False
+  
+  If (InStr(1, strString, subString) > 0) Then
+    boolExist = True
+  End If
+  
+  stringExist = boolExist
+End Function
+
+' Open specific website with Internet Explorer Browser
+Public Function openBrowserAndNavigate(strURL)
+  closeBrowsers
+  forceClearIECache
+  
+  On Error Resume Next
+  Dim IE
+  Set IE = CreateObject("InternetExplorer.Application")
+  
+  IE.Navigate strURL
+  IE.Visible = True  
+  Wait(IE)  
+  ShowWindow IE.hwnd, SW_MAXIMIZE
+
+  If (Not errorCheck) Then
+    openIE = True
+    getBrowserName
+    If Global.strBrowserName = "Internet Explorer" Then
+      getIeVersion
+      setIERegistrySettings (True)
+    End If
+    
+    Else
+    openIE = False
+  End If
+End Function
+
+' Waiting for Internet Explorer to Complete Loading
+Public Sub Wait(IE)
+  On Error Resume Next
+  Do
+    aqutils.Delay (500)
+  Loop While IE.ReadyState < 4 And IE.Busy
+End Sub 
+
+' Get Internet Explorer Version
+Sub getIeVersion
+  On Error Resume Next
+  Const HKEY_LOCAL_MACHINE = &H80000002
+  strComputer = "."
+  Set oReg = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" & strComputer & "\root\default:StdRegProv")
+  
+  strKeyPath = "SOFTWARE\Microsoft\Internet Explorer"
+  strValueName = "svcVersion"
+  oReg.GetStringValue HKEY_LOCAL_MACHINE,strKeyPath,strValueName,strValue
+  strValueArray = split(strValue, ".")
+  Global.strBrowserVersion = strValueArray(0) & "." & strValueArray(1)  
+
+  Set oReg = Nothing
+End Sub
+
+' Closing all browsers
+Public Sub closeBrowsers
+  On Error Resume Next
+  terminateProcess ("iexplore")
+  terminateProcess ("chrome")
+  terminateProcess ("firefox")
+  setIERegistrySettings (False)
+End Sub
+
+' Closing Specific Browser
+Public Sub browserToClose (strBrowserTitle)
+	On Error Resume Next
+	dim objShell, objWindow, strOrigBrowserTitle
+	set objShell = CreateObject("Shell.Application")
+
+  strOrigBrowserTitle = strBrowserTitle
+  brCount = objShell.Windows.Count
+  For i = 0 to brCount - 1
+  	For each objWindow in objShell.Windows
+        bName = objWindow.FullName        
+        
+  			If InStr(objWindow.FullName,UCase("iexplore")) then
+          brTitle = objWindow.document.title
+          If LCase(strBrowserTitle) = LCase("all") Then
+            strBrowserTitle = brTitle
+          End If          
+          
+          If brTitle = strBrowserTitle Then
+            objWindow.Quit
+            waitFor (1)
+            strBrowserTitle = strOrigBrowserTitle
+  					logMessage "Pass", "Internet Explorer Browser", "Internet Explorer browser closing OK" & VbCr &"Browser Title: " & brTitle, 100
+  				End if
+  			End if
+  	Next
+  Next
+
+	terminateProcess ("chrome")
+  terminateProcess ("firefox")
+  setIERegistrySettings (False)
+  
+  set objShell = Nothing
+End Sub
+
+Public Function checkInitialCaps (strString)
+  On Error Resume Next
+  Dim properCaseString, boolIsProperCase
+  boolIsProperCase = False
+  properCaseString = properCase (strString)
+  properCaseStringAsciiValue = getAsciiValue (properCaseString)   
+  suppliedStringAsciiValue = getAsciiValue (strString)
+   
+  If suppliedStringAsciiValue = properCaseStringAsciiValue Then
+    boolIsProperCase = True
+  End If
+   
+  checkInitialCaps = boolIsProperCase
+End Function
+
+' Checking if string is null or empty
+Public Function checkNullEmpty (strString)
+  On Error Resume Next
+  boolCheck = False
+  
+  If Not IsEmpty(strString) Or Not IsNull(strString) Then
+    boolCheck = True
+  End If
+
+  checkNullEmpty = boolCheck
+End Function
+
+' Convert NULL string to empty
+Public Function convertNullEmpty (strStringToConvert)
+  On Error Resume Next
+  
+  If (IsNull(strStringToConvert)) Then
+    strStringToConvert = ""
+  End If
+  
+  convertNullEmpty = strStringToConvert
+End Function
+
+' Clear Internet Explorer Cache
+Public Sub forceClearIECache
+  On Error Resume Next
+  Set WshShell = CreateObject("WScript.Shell")
+  WshShell.run "RunDll32.exe InetCpl.cpl,ClearMyTracksByProcess 8"
+
+  'To clear browsing cookies
+  WshShell.run "RunDll32.exe InetCpl.cpl,ClearMyTracksByProcess 2"
+
+  'To Clear Browsing History
+  WshShell.run "RunDll32.exe InetCpl.cpl,ClearMyTracksByProcess 1"   
+End Sub
+
+' Generate Random Numbers
+Public Sub generateRandomNumber(intHigh, intLow)
+  On Error Resume Next
+  For i = intLow to intHigh
+    Randomize
+    intNumber = Int((intHigh - intLow + 1) * Rnd + intLow)
+  Next
+  Global.intNumberOfLogins = intNumber
+End Sub
+
+' Get Browser Name
+Public Sub getBrowserName
+  On Error Resume Next
+  Dim objWMIService, colProcessList
+  Const strComputer = "." 
+
+  processNamesArray = Split(processNames, ".")
+  processNames = processNamesArray(0)
+  
+  Set objWMIService = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
+  Set colProcessList = objWMIService.ExecQuery("SELECT * FROM Win32_Process")
+  
+  For Each objProcess in colProcessList 
+    If stringExist(objProcess.Name, "Firefox") Then
+      Global.strBrowserName = "FireFox"
+      Exit For
+      ElseIf stringExist(objProcess.Name, "Chrome") Then
+      Global.strBrowserName = "Google Chrome"
+      Exit For
+      ElseIf stringExist(objProcess.Name, "iexplore") Then
+      Global.strBrowserName = "Internet Explorer"
+      Exit For
+      Else
+      logMeggage "Warning", "Browser Name", "Unknown", 100
+    End If
+  Next 
+  
+  Set objWMIService = Nothing
+  Set colProcessList = Nothing
+End Sub
+
+' Change String to Proper Case
+Public Function properCase (strText)
+  On Error Resume Next
+  Dim strLen, tmpChar, tmpStr, boolIsSpace
+  boolIsSpace = False
+  strLen = Len(strText)
+  
+  For i = 1 To strLen
+    If i <> 1 Then
+      If mid(strText, i, 1) = " " Then
+        boolIsSpace = True
+        tmpChar = mid(strText, i, 1)
+        Else
+        If boolIsSpace Then
+          tmpChar = UCase(mid(strText, i, 1))
+          boolIsSpace = False
+          Else
+          tmpChar = LCase(mid(strText, i, 1))
+        End If
+      End If
+      
+      Else
+      tmpChar = UCase(mid(strText, i, 1))
+    End if
+    
+    tmpStr = tmpStr & tmpChar
+  Next
+  
+  properCase = tmpStr
+End Function
+
+' Setup Internet Explorer for Running Tests
+Public Function setIERegistrySettings(boolSwitch)
+  On Error Resume Next
+  Set sh = CreateObject("WScript.Shell") 
+  Set objReg = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" & Sys.HostName & "\root\default:StdRegProv")
+
+  regZoomPath = "Software\Microsoft\Internet Explorer\Zoom"
+  regZoomValueName = "ZoomFactor"
+  regRecoveryPath = "Software\Microsoft\Internet Explorer\Recovery"
+  regRecoveryValueName1 = "AutoRecover"
+  regRecoveryValueName2 = "NoReopenLastSession"
+  regShowMenuPath = "Software\Microsoft\Internet Explorer\MINIE"
+  regSHowMenuName = "AlwaysShowMenus"
+  
+  If DWORD32Value <> 100000 Then
+    objReg.SetDWORDValue HKEY_CURRENT_USER, regShowMenuPath, regSHowMenuName, 100000
+  End If
+    
+  If (boolSwitch) Then
+    ' Set ZoomFactor registry value
+    objReg.GetDWORDValue HKEY_CURRENT_USER, regZoomPath, regZoomValueName, DWORD32Value 
+    If DWORD32Value <> 100000 Then
+      objReg.SetDWORDValue HKEY_CURRENT_USER, regZoomPath, regZoomValueName, 100000
+    End If
+
+    ' Set/Add IE recovery values
+    objReg.GetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName1, DWORD32Value
+    If IsNull(DWORD32Value) Then
+      objReg.CreateKey HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName1
+      objReg.SetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName1, 00000002
+      Elseif DWORD32Value <> 00000002 Then
+      objReg.SetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName1, 00000002
+    End If
+  
+    objReg.GetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName2, DWORD32Value
+    If IsNull(DWORD32Value) Then
+      objReg.CreateKey HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName2
+      objReg.SetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName2, 100000
+      Elseif DWORD32Value <> 100000 Then
+      objReg.SetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName2, 100000
+    End If
+  
+    ' Set PopupMgR registry value
+    PopupBlocker = sh.RegRead("HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\New Windows\PopupMgR")
+  
+    If (PopupBlocker = &H0) Then
+      sh.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\New Windows\PopupMgR", &H1, "REG_DWORD"
+    End If
+    
+    Else
+    ' Reset PopupMgR registry value
+    PopupBlocker = sh.RegRead("HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\New Windows\PopupMgR")  
+    If (PopupBlocker = &H1) Then
+      sh.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\New Windows\PopupMgR", &H0, "REG_DWORD"
+    End If
+
+    ' Reset IE recovery values
+    regRecoveryPath = "Software\Microsoft\Internet Explorer\Recovery"
+    regRecoveryValueName1 = "AutoRecover"
+    regRecoveryValueName2 = "NoReopenLastSession"
+    ojReg.GetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName1, DWORD32Value
+    
+    If DWORD32Value <> 100000 Then
+      objReg.SetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName1, 100000
+    End If
+  
+    objReg.GetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName2, DWORD32Value
+    If DWORD32Value <> 0 Then
+      objReg.SetDWORDValue HKEY_CURRENT_USER, regRecoveryPath, regRecoveryValueName2, 0
+    End If
+  End If
+  
+  Set sh = nothing
+  Set objReg = nothing
+  SetIERegistrySettings = True
+End Function
+
+' Terminate Process
+Public Function terminateProcess (processNames)
+  On Error Resume Next
+  Dim objWMIService, colProcessList
+  Const strComputer = "." 
+
+  processNamesArray = Split(processNames, ".")
+  processNames = processNamesArray(0)
+  
+  Set objWMIService = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
+  Set colProcessList = objWMIService.ExecQuery("SELECT * FROM Win32_Process WHERE Name = '" & processNames & ".exe'")
+  
+  For Each objProcess in colProcessList 
+    objProcess.Terminate()
+  Next
+
+  Set objWMIService = Nothing
+  Set colProcessList = Nothing
+End Function
+
+' Verify Results
+Public Function verifyResults(strResultDescription, strExpectedResults, strActualResults)
+  On Error Resume Next
+  If (removeSpecialCharacters(expectedRes) = removeSpecialCharacters(actualRes)) Then
+    logMessage "Pass", "Verification - " & strResultDescription, "Expected: " & strExpectedResults & VbCr & "Actual: " & strActualResults, 100
+    Else
+    logMessage "Fail", "Verification - " & strResultDescription, "Expected: " & strExpectedResults & VbCr & "Actual: " & strActualResults, 300
+    boolIsError = True
+  End If
+End Function
+
+' Find a Process
+Public Function findProcess (strProcessName)
+  On Error Resume Next
+  Dim objWMIService, colProcessList
+  Const strComputer = "." 
+
+  Set objWMIService = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
+  boolTrue = False
+  
+  Do While Not boolTrue
+    Set colProcessList = objWMIService.ExecQuery("SELECT * FROM Win32_Process")
+  
+    For Each objProcess in colProcessList 
+      If objProcess.Name = strProcessName Then
+        boolTrue = True
+      End If
+    Next
+    Set colProcessList = Nothing
+  Loop
+
+  Set objWMIService = Nothing
+  Set colProcessList = Nothing
+  
+  findProcess = boolTrue
+End Function
+
+' Selecting Users for Login
+public Sub numberOfLogins (intiValue)
+  sqlLogins = "select * from Login"
+  Set dbRecordSet = fetchInputDataByQuery (sqlLogins)
+  dbRecordSet.MoveFirst
+
+  If dbRecordSet.EOF And dbRecordSet.BOF Then
+    logMessage "Fail", "Number of Records Fetched from DB", "No records found", 500
+    Else
+    intRecordCount = dbRecordSet.RecordCount
+    
+    If Global.intNumberOfLogins <= 0 Then
+      logMessage "Fail", "Number of Logins", "Number of logins requested: " & Global.intNumberOfLogins & ", which is not valid" & VbCr & "Exiting Test .....", 500
+        Runner.Stop (True)
+    End If
+    
+    If Global.intNumberOfLogins > intRecordCount Then
+      logMessage "Fail", "Number of Logins", "Number of logins requested: " & Global.intNumberOfLogins & VbCr & "number of records in Database: " _
+        & intRecordCount & VbCr & "Exiting Test .....", 500
+      Runner.Stop (True)
+      
+      Else
+      For i = 1 To intiValue
+        If i = intiValue Then
+          Global.strUserName = dbRecordSet("UserName").Value
+          Global.strPassword = dbRecordSet("Password").Value
+          Global.strMiddleName = dbRecordSet("MiddleName").Value
+          Global.strHighSchool = dbRecordSet("HighSchool").Value
+          Global.strGrandMother = dbRecordSet("GrandMother").Value
+          Global.strSecurityQuestion4 = dbRecordSet("SecurityQ4").Value
+          
+          Else
+          dbRecordSet.MoveNext
+        End If
+      Next
+    End If
+  End If
+
+  Set dbRecordSet = Nothing
+End Sub
+
+Public Function removeSpecialCharacters (strString)
+  On Error Resume Next
+'  intAscValue = 0
+  tempStr = ""
+  For i = 0 to Len (strString) - 1
+    intVal = asc(Mid(strString, i+1, 1))
+    charVal = Mid(strString, i+1, 1)
+'    intAscValue = intAscValue + intVal
+    If (intVal > 64 And intVal < 91) Or (intVal > 96 And intVal < 123) Or (intVal > 47 And intVal < 58) Then
+      tempStr = tempStr & charVal
+    End If
+  Next
+  removeSpecialCharacters = tempStr
 End Function
