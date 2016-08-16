@@ -15,6 +15,7 @@ Dim objStopWatch
 Dim objLoginPage
 
 ' Global Datatype - Strings
+strRunenv = "demo"
 strUserName = ""
 strPassword = ""
 strMiddleName = ""
@@ -22,7 +23,6 @@ strHighSchool = ""
 strGrandMother = ""
 strSecurityQuestion4 = ""
 strDeviceName = ""
-strRunenv = "Demo"
 strFileExtension = ".mht"
 strAppResultsPath = "C:\TestCompleteLog"
 strLogFileName = "D3TCFApp"

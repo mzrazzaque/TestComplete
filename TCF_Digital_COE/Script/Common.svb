@@ -241,7 +241,7 @@ Public Function openBrowserAndNavigate(strURL)
   
   IE.Navigate strURL
   IE.Visible = True  
-  Wait(IE)  
+  Wait(IE)
   ShowWindow IE.hwnd, SW_MAXIMIZE
 
   If (Not errorCheck) Then
@@ -584,7 +584,7 @@ End Function
 
 ' Selecting Users for Login
 public Sub numberOfLogins (intiValue)
-  sqlLogins = "select * from Login"
+  sqlLogins = "Select * from Login where Env = '" & Global.strRunenv & "'"
   Set dbRecordSet = fetchInputDataByQuery (sqlLogins)
   dbRecordSet.MoveFirst
 
@@ -637,3 +637,8 @@ Public Function removeSpecialCharacters (strString)
   Next
   removeSpecialCharacters = tempStr
 End Function
+
+' Get online URL by Environment
+Public Sub getOnlineBankingURL
+  Global.strOnlineBankingUrl = "https://fi1-tcf" & Global.strRunenv & ".dev.d3banking.com/"
+End Sub

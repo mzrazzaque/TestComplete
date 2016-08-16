@@ -16,6 +16,9 @@
 
 ' Capture Machine, Browser and OS Info
 Public Sub capturemachineBrowserOSInfo ()
+  ' Capture Environment and App URL
+  getOnlineBankingURL
+  
 '  waitForLoadingObject "TCF Logo", objLoginPage, "className", "col-xs-4 logo-image"  
   ' Cappture App Version
 '  strAppVer = objLoginPage.FindChild("className", "appVersion", 30).innerText
