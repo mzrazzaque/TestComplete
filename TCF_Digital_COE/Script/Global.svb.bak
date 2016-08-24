@@ -15,6 +15,7 @@ Dim objStopWatch
 Dim objLoginPage
 
 ' Global Datatype - Strings
+strRunenv = "demo"
 strUserName = ""
 strPassword = ""
 strMiddleName = ""
@@ -22,7 +23,6 @@ strHighSchool = ""
 strGrandMother = ""
 strSecurityQuestion4 = ""
 strDeviceName = ""
-strRunenv = "Demo"
 strFileExtension = ".mht"
 strAppResultsPath = "C:\TestCompleteLog"
 strLogFileName = "D3TCFApp"
@@ -39,6 +39,8 @@ strBrowserName = ""
 strBrowserVersion = ""
 
 ' Global Datatype - String Arrays
+arrStateCode = "AA;AB;AE;AK;AL;AP;AR;AS;AZ;BC;CA;CO;CT;DC;DE;FL;FM;GA;GU;HI;IA;ID;IL;IN;KS;KY;LA;MA;MB;MD;ME;MH;MI;MN;" _
+  & "MO;MP;MS;MT;NB;NC;ND;NE;NH;NJ;NL;NM;NS;NT;NU;NV;NY;OH;OK;ON;OR;PA;PE;PR;PW;QC;RI;SC;SD;SK;TN;TX;UT;VA;VI;VT;WA;WI;WV;WY;YT"
 
 
 ' Global Datatype - Integers
@@ -52,3 +54,4 @@ intNumberOfLogins = 4
 
 
 ' Global Datatype - Character Arrays
+
