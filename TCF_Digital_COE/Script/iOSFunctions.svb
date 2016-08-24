@@ -23,9 +23,9 @@ Public Sub initDevice
       logMessage "FAIL", "Application executable", "Application executable not found" & VbCr & "Exiting Test ...", 500
       Runner.Stop (True)
     End If  
-    Mobile.Device("*").Process("TCF Bank").WaitChild "Exists",10000
+    Mobile.Device("*").Process("TCF Bank").WaitChild "Exists",5000
     ' Creating TCF App object
-    Set Global.objMobileApp = Mobile.Device("*").Process("TCF Bank")        
+    Set Global.objMobileApp = Mobile.Device("*").Process("TCF Bank")
     Else
     logMessage "FAIL", "Device Availability", "No Devices available" & VbCr & "Exiting Test ...", 500
     Runner.Stop (True)
@@ -224,3 +224,81 @@ Public Sub logoutUser
   ' Verify Logout
   verifyAndLogObjectsExists objMobileApp, "objectIdentifier", "challengeUsername", "LogOut Sucessful"  
 End Sub
+
+Public Sub selectMenuItem (strMenuName)
+  ' Use "Accounts" for Accounts Menu and "Settings Accounts" for Accounts sub-menu under Settongs
+  Select Case UCase(strMenuName)
+    Case UCase("Dashboard")
+      objMobileApp.FindChild ("classname", "nav-icon dashboard", 30).Click
+    Case UCase("Messages")
+      objMobileApp.FindChild ("classname", "nav-icon messages", 30).Click
+    Case UCase("Notices")
+      objMobileApp.FindChild ("namePropStr", "cordova.html#messages", 30).Click
+    Case UCase("Secure Messages")
+      objMobileApp.FindChild ("namePropStr", "secure", 30).Click
+    Case UCase("Accounts")
+      objMobileApp.FindChild ("classname", "nav-icon accounts", 30).Click
+    Case UCase("Transactions")
+      objMobileApp.FindChild ("classname", "nav-icon transactions", 30).Click
+    Case UCase("Money Movement")
+      objMobileApp.FindChild ("classname", "nav-icon money-movement", 30).Click
+    Case UCase("Schedule")
+      objMobileApp.FindChild ("namePropStr", "cordova.html#money-movement", 30).Click
+    Case UCase("Recipients")
+      objMobileApp.FindChild ("namePropStr", "recipients", 30).Click
+    Case UCase("Planning")
+      objMobileApp.FindChild ("classname", "nav-icon planning", 30).Click
+    Case UCase("Budget")
+      objMobileApp.FindChild ("namePropStr", "cordova.html#planning", 30).Click
+    Case UCase("Goals")
+      objMobileApp.FindChild ("namePropStr", "goals", 30).Click    
+    Case UCase("Self Service")
+      objMobileApp.FindChild ("classname", "nav-icon self-service", 30).Click
+    Case UCase("FAQ's")
+      objMobileApp.FindChild ("namePropStr", "Customer-Service#OnlineandMobileBanking", 30).Click
+    Case UCase("Online and Mobile Agreement")
+      objMobileApp.FindChild ("namePropStr", "request-forms", 30).Click
+    Case UCase("Settings")
+      objMobileApp.FindChild ("classname", "nav-icon settings", 30).Click
+    
+    ' Seeting - Profile
+    Case UCase("Profile")
+      objMobileApp.FindChild ("namePropStr", "cordova.html#settings", 30).Click
+      waitForLoadingObject "Change Address", objMobileApp, "className", "btn btn-default edit-address"
+    
+    Case UCase("Settings Accounts")
+      objMobileApp.FindChild ("namePropStr", "accounts", 30).Click
+    Case UCase("Alerts")
+      objMobileApp.FindChild ("namePropStr", "alerts", 30).Click
+    Case UCase("Categories")
+      objMobileApp.FindChild ("namePropStr", "Categories", 30).Click
+    Case UCase("Rules")
+      objMobileApp.FindChild ("namePropStr", "rules", 30).Click
+    Case UCase("Mobile")
+      objMobileApp.FindChild ("namePropStr", "mobile", 30).Click
+    Case UCase("Logout")
+      objMobileApp.FindChild ("classname", "glyphicon glyphicon-off", 30).Click
+    
+    Case Else
+      logMessage "Fail", "Menu Item", "Menu Item '" & strMenuName & "' not found. Check item name", 300    
+  End Select  
+End Sub
+
+Public Sub buttonClick (strButtonName)
+  If strButtonName = "Change Name" Then
+    objMobileApp.FindChild ("className", "btn btn-default edit-name", 30).Click
+    waitForLoadingObject "Change Name", objMobileApp, "htmlFor", "first-name"
+    ElseIf strButtonName = "Change Address" Then
+    objMobileApp.FindChild ("className", "btn btn-default edit-address", 30).Click
+    waitForLoadingObject "Change Address", objMobileApp, "htmlFor", "physicalAddress-line1"    
+    ElseIf strButtonName = "Change Contact Info" Then
+    objMobileApp.FindChild ("className", "btn btn-default edit-info", 30).Click
+    waitForLoadingObject "Change Name", objMobileApp, "htmlFor", "Primary Email"
+    ElseIf strButtonName = "Cancel" Then
+    objMobileApp.FindChild ("className", "btn btn-default close-btn", 30).Click
+    ElseIf strButtonName = "Save" Then
+    objMobileApp.FindChild ("className", "btn btn-default save-btn", 30).Save
+  End If
+End Sub
+
+

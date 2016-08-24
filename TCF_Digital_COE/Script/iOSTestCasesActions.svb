@@ -1,0 +1,142 @@
+﻿'USEUNIT Global
+'USEUNIT Common
+'USEUNIT iOSFunctions
+
+' ##############################################################################################
+' ####	Copyright: 2016 TCF Bank
+' ####
+' ####	File Name: iOSTestCases
+' ####	Test Script Name: mobileLogin
+' ####	Purpose: This file is the home of all mobile iOS Test Cases
+' ####
+' ####	Created on: August 16, 2016
+' ####	Created by: Mohammed Razzaque & Shreekumar Raghavan
+' ##############################################################################################
+
+Public Sub TC_35749_Actions ()
+  ' Select Menu
+  clickOnNavToggle ()
+  
+  ' Select Sub-Menu Profile
+  selectMenuItem ("Profile")
+  
+  ' Change Address
+  buttonClick ("Change Address")
+  
+  ' Verify Buttons & Fields - 
+  ' Cancel Button
+  verifyAndLogObjectsExists objMobileApp, "className", "btn btn-default close-btn", "Cancel"
+  ' Save Button
+  verifyAndLogObjectsExists objMobileApp, "className", "btn btn-default save-btn", "Save"
+  ' Address Line 1
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-line1", "Address Line 1 Label"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_line1", "Address Line 1 Textbox"  
+  ' Address Line 2
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-line2", "Address Line 2"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_line2", "Address Line 2 Textbox"
+  ' Address Line 3
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-line3", "Address Line 3"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_line3", "Address Line 3 Textbox"
+  ' Address Line 4
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-line4", "Address Line 4"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_line4", "Address Line 4 Textbox"
+  ' City
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-city", "City"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_city", "City Textbox"
+  ' State
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-state", "State"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "state", "State Textbox"
+  ' ZIP Code
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-postal-code", "ZIP Code"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "postalCode", "ZIP Code 1 Textbox"
+  ' Country
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-countryCode", "Country"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "countryCode", "Country Code 1 Textbox"
+  
+  ' Validate Address Line's Character lines  
+  ' Verifying Address Line 1, 2, 3 & 4 with less than 100/50 characters, 100/50 characters and more than 100/50 characters
+  intArray = "35;50;60"
+  intCharArray = Split(intArray, ";")
+  
+  For j = 1 To 4
+    For i = 0 To UBound(intCharArray)
+      objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Click
+      If j = 1 Then
+        objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).SetText (createStringByLength((intCharArray(i) * 2)))
+        Else
+        objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).SetText (createStringByLength(intCharArray(i)))
+      End If
+      intGetStringLength = Len(objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).wText)
+  
+      If intGetStringLength > 0 And intGetStringLength <= 100 Then
+        logMessage "PASS", "Number of Characters in Address Line " & j, "Number of characters accepted is: " & intGetStringLength, 100
+        ElseIf intGetStringLength < 1 Then
+        logMessage "Fail", "Number of Characters in Address Line " & j, "Number of characters accepted is: " & intGetStringLength, 300
+        Else
+        logMessage "Fail", "Number of Characters in Address Line " & j, "Number of characters accepted is: " & intGetStringLength, 300
+      End If
+    Next
+  Next
+  
+  ' Validate Address Line's Character lines  
+  ' Verifying Address Line 1, 2, 3 & 4 with special characters
+  Dim objAddressLine
+  strArray = "~;`;<;>;^;|;\;/;"""
+  strCharArray = Split(strArray, ";")
+  strSpecialCharacters = "~`<>^|\/"
+  strErrorString = "The characters ~ ` < > ^ | \ / "" are not allowed."
+  
+  For j = 1 To 4
+'    strOuterHTML = "<input name="""line3" class="""form-control""" id="""physicalAddress-line3""" type="""text""" maxlength="""50""" placeholder="""Address Line 3""">"
+    
+    If  objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Exists Then
+      Set objAddressLine =  objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Parent
+'      Else
+'      Set objAddressLine = objMobileApp.FindChild ("className", "form-group", 30)
+    End If
+    
+    For i = -1 To UBound(strCharArray)
+      objAddressLine.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Click
+      objAddressLine.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).SetText ""
+      If UCase(objAddressLine.FindChild ("htmlFor", "physicalAddress-line" & j, 30).innerText) = UCase("Address Line " & j) Then
+        If i = -1 Then
+          objAddressLine.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).SetText (strArray)
+          Else
+          objAddressLine.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).SetText (strCharArray(i))
+        End If
+        
+        objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_city", 30).Click
+        If objAddressLine.FindChild ("className", "help-block error-message", 30).Exists Then
+          If objAddressLine.FindChild ("className", "help-block error-message", 30).contentText = strErrorString Then
+            logMessage "PASS", "Error Message Validation in Address Line " & j, "Following error message appears" & VbCr & strErrorString, 100
+          End If
+          ElseIf objAddressLine.FindChild ("className", "help-block error-message hidden", 30).Exists Then
+          logMessage "Fail", "Error Message Validation in Address Line " & j, "No Error Message Displays", 500
+          Else
+          logMessage "Fail", "Error Message Validation in Address Line " & j, "Following error message appears" & VbCr & strErrorString, 300
+        End If
+        
+        Else
+        logMessage "Fail", "Address Line " & j & " object", "Could not locate Address Line " & j & " object", 500
+      End If
+    Next
+    
+    Set objAddressLine = Nothing
+  Next
+  
+  ' Cancel all changes
+'  Do While objMobileApp.FindChild ("className", "btn btn-default close-btn", 30).VisibleOnScreen = False
+'    objMobileApp.
+  objMobileApp.FindChild ("className", "btn btn-default close-btn", 30).Click
+  waitForLoadingObject "Change Address", objMobileApp, "className", "btn btn-default edit-address"
+End Sub
+
+
+
+
+
+
+
+
+
+

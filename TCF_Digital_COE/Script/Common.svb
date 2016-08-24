@@ -642,3 +642,15 @@ End Function
 Public Sub getOnlineBankingURL
   Global.strOnlineBankingUrl = "https://fi1-tcf" & Global.strRunenv & ".dev.d3banking.com/"
 End Sub
+
+' Random String by Number
+Public Function createStringByLength(intLength)
+  Randomize
+  Dim strString
+  strString = "abcdefghijklmnopqrstuvwxyz"
+  strString = strString & UCase(strString) & "0123456789"
+
+  For i = 1 To intLength
+    createStringByLength = createStringByLength & Mid(strString, Int(Rnd() * Len(strString) + 1), 1)
+  Next
+End Function

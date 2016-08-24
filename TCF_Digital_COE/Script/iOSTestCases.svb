@@ -1,6 +1,7 @@
 ﻿'USEUNIT Global
 'USEUNIT Common
 'USEUNIT iOSFunctions
+'USEUNIT iOSTestCasesActions
 
 ' ##############################################################################################
 ' ####	Copyright: 2016 TCF Bank
@@ -14,9 +15,9 @@
 ' ##############################################################################################
 
 
-Sub mobileLogin
+Public Sub mobileLogin
   ' Initialize Devices, Install and Run App Under Test
-  initDevice    
+  initDevice
   
   ' App Version
   captureAppDeviceOSInfo  
@@ -39,3 +40,26 @@ Sub mobileLogin
   ' Close App Under Test and Cleanup
   cleanUp 
 End Sub
+
+Public Sub TC_35749
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Login
+  loginUser (1)
+  securityAnswer ()
+  
+  ' Call Actions
+  TC_35749_Actions ()
+  
+  ' Logout from App Under Test
+  clickOnNavToggle ()
+  logoutUser ()
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+
+
+
