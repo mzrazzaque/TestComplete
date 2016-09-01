@@ -1,0 +1,166 @@
+﻿'USEUNIT Common
+'USEUNIT Global
+'USEUNIT iOSFunctions
+'USEUNIT S_2_iOS_TestCasesActions
+
+' ##############################################################################################
+' ####	Copyright: 2016 TCF Bank
+' ####
+' ####	File Name: S_2_iOSTestCases
+' ####	Test Script Name: mobileLogin
+' ####	Purpose: This file is the home of all mobile iOS Test Cases
+' ####
+' ####	Created on: June 30, 2016
+' ####	Created by: Mohammed Razzaque & Shreekumar Raghavan
+' ##############################################################################################
+
+
+Public Sub mobileLogin
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' App Version
+  captureAppDeviceOSInfo  
+  
+  ' Login
+  generateRandomNumber 4, 1
+  For i = 1 To Global.intNumberOfLogins
+    loginUser i,""
+    securityAnswer
+    scrapeAccountTotals
+    clickOnNavToggle
+  
+    ' Logout from App Under Test
+    logoutUser
+  Next
+    
+  ' Email Results
+'  emailTestResults
+  
+  ' Close App Under Test and Cleanup
+  cleanUp 
+End Sub
+
+Public Sub TC_35749
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Login
+  loginUser 1,""
+  securityAnswer ()
+  
+  ' Call Actions
+  TC_35749_Actions ()
+  
+  ' Logout from App Under Test
+  clickOnNavToggle ()
+  logoutUser ()
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+Public Sub TC_35751 'B-01328 Login with correct credentials is successful
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Call Actions
+  TC_35751_Actions
+  
+  ' Logout from App Under Test
+  clickOnNavToggle
+  logoutUser ()  
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+Public Sub TC_35764 'B-01328 Login with incorrect credentials is not successful 
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Call Actions
+  TC_35764_Actions ()
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+Public Sub TC_35883 'B-01328 Login with new device does lead to security questions
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Call Actions
+  TC_35883_Actions
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+Public Sub TC_35866 'B-01328 Login with original device does not lead to security questions
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Call Actions
+  TC_35866_Actions
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+
+
+Public Sub TC_35766 'B-01328 User locked out after more than 3 incorrect login attempts.
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Call Actions
+  TC_35766_Actions
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+
+Public Sub TC_35812 'B-01328 User not locked out after less than 3 incorrect login attempts.
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Call Actions
+  TC_35812_Actions
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+Public Sub TC_35823 'B-01328 Valid login resets 3 login attempts
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Call Actions
+  TC_35823_Actions
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+Public Sub TC_36793
+  ' Initialize Devices, Install and Run App Under Test
+  initDevice
+  
+  ' Login
+  loginUser (1)
+  securityAnswer ()
+
+  ' Call Actions
+  TC_35749_Actions ()
+  
+  ' Logout from App Under Test
+  clickOnNavToggle ()
+  logoutUser ()
+  
+  ' Close App Under Test and Cleanup
+  cleanUp ()
+End Sub
+
+
