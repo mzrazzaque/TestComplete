@@ -44,6 +44,19 @@
 					</testItem>
 				</children>
 			</testItem>
+			<testItem name="Sprint 2" key="{EC9D49DF-6CB9-4EAC-91E4-8958E0B98F95}" group="False" enabled="True" testMoniker="" count="1" timeout="0" stopOnError="2" stopOnException="2" description="">
+				<testParameters />
+				<children>
+					<testItem name="TC_35749" key="{4EE5F09D-9B35-42A6-A90E-2BB42B30E0CF}" group="False" enabled="True" testMoniker="{8B08A193-B17F-44AB-B6DE-01D5B22C3EC3}TC_35749" count="1" timeout="0" stopOnError="2" stopOnException="2" description="">
+						<testParameters />
+						<children />
+					</testItem>
+					<testItem name="Email Results" key="{5FF7556D-91F7-4212-AFA2-5DBEB5FE50D0}" group="False" enabled="True" testMoniker="{978E4BC0-0FC6-4F88-8C92-813BD805CA2A}emailTestResults" count="1" timeout="0" stopOnError="2" stopOnException="2" description="">
+						<testParameters />
+						<children />
+					</testItem>
+				</children>
+			</testItem>
 		</children>
 	</testItems>
 	<variables key="{11516151-E057-465E-9142-A1C0BBB0E07C}">
@@ -594,8 +607,8 @@
 		<Templates>
 			<Template Id="{1EB17ADF-E4EB-404D-97DC-AD758A1E8C1D}" ConnectionId="{00000000-0000-0000-0000-000000000000}" Description="This template is used by TestComplete&apos;s Log subsystem to post test results to an issue-tracking system. You can also use it at your desire." Name="CreateWorkItem" IsSystem="True" ItemTypeName="" ProjectName="" IsEditing="False" ItemId="">
 				<Fields>
-					<Field ItemId="{20FB839B-F6D0-4D5C-B455-416D115A7879}" AliasIsRequired="True" DBFieldNameIsRequired="False" Value="" DBFieldName="" Alias="Subject" />
-					<Field ItemId="{00394372-8DA9-49E8-B4A3-C6A8D647D7CB}" AliasIsRequired="True" DBFieldNameIsRequired="False" Value="" DBFieldName="" Alias="Description" />
+					<Field ItemId="{8D15C695-DE80-4927-BA46-C7B2F08CBCAD}" AliasIsRequired="True" DBFieldNameIsRequired="False" Value="" DBFieldName="" Alias="Subject" />
+					<Field ItemId="{D01D9F77-52A6-461E-8589-4AB4A9CE9C10}" AliasIsRequired="True" DBFieldNameIsRequired="False" Value="" DBFieldName="" Alias="Description" />
 				</Fields>
 			</Template>
 		</Templates>

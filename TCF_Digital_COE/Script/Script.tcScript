@@ -10,8 +10,8 @@
 		<child name="iOSFunctions" key="{194FE85E-B0CB-4A40-B418-C81C4FCF9111}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
 			<data path="iOSFunctions.svb" />
 		</child>
-		<child name="iOSTestCases" key="{8B08A193-B17F-44AB-B6DE-01D5B22C3EC3}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
-			<data path="iOSTestCases.svb" />
+		<child name="S_2_iOS_TestCases" key="{8B08A193-B17F-44AB-B6DE-01D5B22C3EC3}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
+			<data path="S_2_iOS_TestCases.svb" />
 		</child>
 		<child name="Workspace" key="{DAC03147-D901-4A62-B7C0-BB3669DBA621}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
 			<data path="Workspace.svb" />
@@ -22,13 +22,20 @@
 		<child name="OnlineTestCases" key="{0360F575-5931-4531-B314-AF874BF32589}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
 			<data path="OnlineTestCases.svb" />
 		</child>
+		<child name="S_2_iOS_TestCasesActions" key="{AD64E80F-06F9-4FFD-BB5B-E8822CFFA174}" type="Script Unit" typeId="{291CAE9C-4D20-4F33-8B5F-D48B587F3D65}" pluginName="Script">
+			<data path="S_2_iOS_TestCasesActions.svb" />
+		</child>
 	</children>
 	<folders>
 		<folder caption="Android OS Mobile" description="A logical folder that is used to organize project items and elements." moniker="" />
 		<folder caption="iOS mobile" description="A logical folder that is used to organize project items and elements." moniker="">
+			<folders>
+				<folder caption="Sprint 2" description="A logical folder that is used to organize project items and elements." moniker="" />
+			</folders>
 			<references>
 				<ref key="{194FE85E-B0CB-4A40-B418-C81C4FCF9111}" />
 				<ref key="{8B08A193-B17F-44AB-B6DE-01D5B22C3EC3}" />
+				<ref key="{AD64E80F-06F9-4FFD-BB5B-E8822CFFA174}" />
 			</references>
 		</folder>
 		<folder caption="Online" description="A logical folder that is used to organize project items and elements." moniker="">
