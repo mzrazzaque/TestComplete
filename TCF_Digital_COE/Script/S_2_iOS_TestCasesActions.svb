@@ -1,0 +1,351 @@
+﻿'USEUNIT Global
+'USEUNIT Common
+'USEUNIT iOSFunctions
+
+' ##############################################################################################
+' ####	Copyright: 2016 TCF Bank
+' ####
+' ####	File Name: S_2_iOSTestCasesActions
+' ####	Test Script Name: mobileLogin
+' ####	Purpose: This file is the home of all mobile iOS Test Cases
+' ####
+' ####	Created on: August 16, 2016
+' ####	Created by: Mohammed Razzaque & Shreekumar Raghavan
+' ##############################################################################################
+
+Public Sub TC_35749_Actions ()
+  ' Select Menu
+  clickOnNavToggle ()
+  
+  ' Select Sub-Menu Profile
+  selectMenuItem ("Profile")
+  
+  ' Change Address
+  buttonClick ("Change Address")
+  
+  ' Verify Buttons & Fields - 
+  ' Cancel Button
+  verifyAndLogObjectsExists objMobileApp, "className", "btn btn-default close-btn", "Cancel"
+  ' Save Button
+  verifyAndLogObjectsExists objMobileApp, "className", "btn btn-default save-btn", "Save"
+  ' Address Line 1
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-line1", "Address Line 1 Label"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_line1", "Address Line 1 Textbox"  
+  ' Address Line 2
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-line2", "Address Line 2"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_line2", "Address Line 2 Textbox"
+  ' Address Line 3
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-line3", "Address Line 3"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_line3", "Address Line 3 Textbox"
+  ' Address Line 4
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-line4", "Address Line 4"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_line4", "Address Line 4 Textbox"
+  ' City
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-city", "City"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "physicalAddress_city", "City Textbox"
+  ' State
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-state", "State"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "state", "State Textbox"
+  ' ZIP Code
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-postal-code", "ZIP Code"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "postalCode", "ZIP Code 1 Textbox"
+  ' Country
+  verifyAndLogObjectsExists objMobileApp, "htmlFor", "physicalAddress-countryCode", "Country"
+  verifyAndLogObjectsExists objMobileApp, "ObjectIdentifier", "countryCode", "Country Code 1 Textbox"
+  
+  ' Validate Address Line's Character lines  
+  ' Verifying Address Line 1, 2, 3 & 4 with less than 100/50 characters, 100/50 characters and more than 100/50 characters
+  intArray = "35;50;60"
+  intCharArray = Split(intArray, ";")
+  
+  For j = 1 To 4
+    For i = 0 To UBound(intCharArray)
+      objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Click
+      If j = 1 Then
+        objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).SetText (createStringByLength((intCharArray(i) * 2)))
+        Else
+        objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).SetText (createStringByLength(intCharArray(i)))
+      End If
+      intGetStringLength = Len(objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).wText)
+  
+      If intGetStringLength > 0 And intGetStringLength <= 100 Then
+        logMessage "PASS", "Number of Characters in Address Line " & j, "Number of characters accepted is: " & intGetStringLength, 100
+        ElseIf intGetStringLength < 1 Then
+        logMessage "Fail", "Number of Characters in Address Line " & j, "Number of characters accepted is: " & intGetStringLength, 300
+        Else
+        logMessage "Fail", "Number of Characters in Address Line " & j, "Number of characters accepted is: " & intGetStringLength, 300
+      End If
+    Next
+  Next
+  
+  ' Validate Address Line's Character lines  
+  ' Verifying Address Line 1, 2, 3 & 4 with special characters
+  Dim objAddressLine
+  strArray = "~;`;<;>;^;|;\;/;"""
+  strCharArray = Split(strArray, ";")
+  strSpecialCharacters = "~`<>^|\/"
+  strErrorString = "The characters ~ ` < > ^ | \ / "" are not allowed."
+  
+  For j = 1 To 4    
+    If  objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Exists Then
+      Set objAddressLine =  objMobileApp.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Parent
+    End If
+    
+    For i = -1 To UBound(strCharArray)
+      objAddressLine.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Click
+      objAddressLine.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).SetText ""
+      If UCase(objAddressLine.FindChild ("htmlFor", "physicalAddress-line" & j, 30).innerText) = UCase("Address Line " & j) Then
+        If i = -1 Then
+        
+          objAddressLine.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Keys (strArray)
+          Else
+          objAddressLine.FindChild ("ObjectIdentifier", "physicalAddress_line" & j, 30).Keys (strCharArray(i))
+        End If
+        
+        objMobileApp.FindChild ("className", "content profile-view entity-edit", 30).Click 2, 2
+        If objAddressLine.FindChild ("className", "help-block error-message", 30).Exists Then
+          If objAddressLine.FindChild ("className", "help-block error-message", 30).contentText = strErrorString Then
+            logMessage "PASS", "Error Message Validation in Address Line " & j, "Following error message appears" & VbCr & strErrorString, 100
+          End If
+          ElseIf objAddressLine.FindChild ("className", "help-block error-message hidden", 30).Exists Then
+          logMessage "Fail", "Error Message Validation in Address Line " & j, "No Error Message Displays", 500
+          Else
+          logMessage "Fail", "Error Message Validation in Address Line " & j, "Following error message appears" & VbCr & strErrorString, 300
+        End If
+        
+        Else
+        logMessage "Fail", "Address Line " & j & " object", "Could not locate Address Line " & j & " object", 500
+      End If
+    Next
+    
+    Set objAddressLine = Nothing
+  Next
+  
+  ' Cancel all changes
+  objMobileApp.FindChild ("className", "btn btn-default close-btn", 30).Click
+  waitForLoadingObject "Change Address", objMobileApp, "className", "btn btn-default edit-address"
+End Sub
+
+Sub TC_35751_Actions ()'B-01328 Login with correct credentials is successful
+' Login
+  loginUser 1,""
+  securityAnswer ()
+  If objMobileApp.FindChild ("className", "col-xs-3 nav-toggle", 30).Exists Then
+    logMessage "PASS", "Valid Username & Pwd Login Sucess", "LogIn Sucessful" & VbCr , 100  
+  Else
+    logMessage "Fail", "Valid Username & Pwd Login Sucess", "Login Failed", 500
+  End If
+  
+End Sub
+
+Sub TC_35764_Actions ()'B-01328 Login with incorrect credentials is not successful
+' Login
+  loginUser 1,"INVALIDUSER"
+  If objMobileApp.FindChild ("className", "alert alert-block fade in alert-error", 30).Exists Then
+    errorMessage = objMobileApp.FindChild ("className", "alert alert-block fade in alert-error", 30).InnerText
+    logMessage "PASS", "Invaid Username Login Error Message ", "Following error message appears" & VbCr & errorMessage, 100  
+  Else
+    logMessage "Fail", "Invaid Username Login Error Message ", "No Error Message Displays", 500
+  End If
+  
+  loginUser 1,"INVALIDPWD"
+  If objMobileApp.FindChild ("className", "alert alert-block fade in alert-error", 30).Exists Then
+    errorMessage = objMobileApp.FindChild ("className", "alert alert-block fade in alert-error", 30).InnerText
+    logMessage "PASS", "Invaid Password Login Error Message ", "Following error message appears" & VbCr & errorMessage, 100  
+  Else
+    logMessage "Fail", "Invaid Password Login Error Message ", "No Error Message Displays", 500
+  End If
+  
+  loginUser 1,"INVALIDBOTH"
+  If objMobileApp.FindChild ("className", "alert alert-block fade in alert-error", 30).Exists Then
+    errorMessage = objMobileApp.FindChild ("className", "alert alert-block fade in alert-error", 30).InnerText
+    logMessage "PASS", "Invaid Username & Password Login Error Message ", "Following error message appears" & VbCr & errorMessage, 100  
+  Else
+    logMessage "Fail", "Invaid Username & Password Login Error Message ", "No Error Message Displays", 500
+  End If 
+End Sub
+
+Sub TC_35883_Actions ()'B-01328 Login with new device does lead to security questions
+' Login
+  loginUser 1,""
+  securityAnswer ()
+  If objMobileApp.FindChild ("className", "col-xs-3 nav-toggle", 30).Exists Then
+    logMessage "PASS", "For New Device Secret Q&A Displays", "Secrer Q&A displays" & VbCr , 100  
+  Else
+    logMessage "Fail", "For New Device Secret Q&A Displays", "Secrer Q&A does not display for new device", 500
+  End If
+  
+End Sub
+
+Sub TC_35866_Actions ()'B-01328 Login with original device does not lead to security questions
+' Login
+  loginUser 1,""
+  securityAnswer ()
+  If objMobileApp.FindChild ("className", "col-xs-3 nav-toggle", 30).Exists Then
+    logMessage "PASS", "Valid Username & Pwd Login Sucess", "LogIn Sucessful" & VbCr , 100  
+  Else
+    logMessage "Fail", "Valid Username & Pwd Login Sucess", "Login Failed", 500
+  End If
+  
+  ' Logout from App Under Test
+  clickOnNavToggle
+  logoutUser ()  
+  
+  loginUser 1,""
+  
+  If objMobileApp.FindChild ("objectIdentifier", "secretQuestionAnswer", 30).Exists Then
+    logMessage "Fail", "LogIn with Original Device, Secret Question check", "Secret Question Displayed for a Original Device", 500      
+  Else
+    logMessage "PASS", "LogIn with Original Device, Secret Question check", "Secret Question Skipped" & VbCr , 100
+  End If
+  waitForLoadingObject "Secret Answer", objMobileApp, "objectIdentifier", "secretQuestionAnswer"
+End Sub
+
+Sub TC_35766_Actions ()'B-01328 User locked out after more than 3 incorrect login attempts.
+' Login
+  loginUser 1,"INVALIDUSER"
+  
+  loginUser 1,"INVALIDPWD"
+  
+  loginUser 1,"INVALIDBOTH"
+  
+  loginUser 1,"INVALIDBOTH"
+
+  If objMobileApp.FindChild ("className", "col-xs-3 nav-toggle", 30).Exists Then
+    logMessage "Fail", "Invalid Login Locks Account after fourth attempts. ", "Account Lock Fails", 500      
+  Else
+    logMessage "PASS", "Invalid Login Locks Account after fourth attempts. ", "Account Lock Sucessful" & VbCr , 100
+  End If
+  
+End Sub
+
+Sub TC_35812_Actions ()'B-01328 User not locked out after less than 3 incorrect login attempts.
+' Login
+  loginUser 1,"INVALIDPWD"
+  
+  loginUser 1,"INVALIDPWD"
+  
+  loginUser 1,""
+  
+  securityAnswer ()
+  If objMobileApp.FindChild ("className", "col-xs-3 nav-toggle", 30).Exists Then
+    logMessage "PASS", "Valid Username & Pwd Login Sucess", "LogIn Sucessful" & VbCr , 100  
+  Else
+    logMessage "Fail", "Valid Username & Pwd Login Sucess", "Login Failed", 500
+  End If
+  ' Logout from App Under Test
+  clickOnNavToggle
+  logoutUser ()  
+End Sub
+
+Sub TC_35823_Actions ()'B-01328 Login with original device does not lead to security questions
+' Login
+  loginUser 1,"INVALIDPWD"
+  
+  loginUser 1,"INVALIDPWD"
+  
+  loginUser 1,""
+  
+  securityAnswer ()
+  
+  ' Logout from App Under Test
+  clickOnNavToggle
+  logoutUser ()  
+  
+  loginUser 1,"INVALIDPWD"
+  
+  If objMobileApp.FindChild ("className", "alert alert-block fade in alert-error", 30).Exists Then
+    errorMessage = objMobileApp.FindChild ("className", "alert alert-block fade in alert-error", 30).InnerText
+    logMessage "PASS", "Invaid Username & Password Login Error Message ", "Following error message appears" & VbCr & errorMessage, 100  
+  Else
+    logMessage "Fail", "Invaid Username & Password Login Error Message ", "No Error Message Displays", 500
+  End If 
+End Sub
+
+Public Sub TC_36793_Actions ()
+  ' Select Menu
+  clickOnNavToggle ()
+  
+  ' Select Sub-Menu Profile
+  selectMenuItem ("Profile")
+  
+  ' Change Address
+  buttonClick ("Change Address")
+  
+
+
+
+
+
+
+ ' Verifying State field with less than 50 characters, 50 characters and more than 50 characters
+  intArray = " ;M;AA;MV;ABC;MN"
+  intCharArray = Split(intArray, ";")
+  stateErrorText1 = "State must be valid state"
+  stateErrorText2 = "Enter a state"
+  
+  Set objState = objMobileApp.FindChild ("ObjectIdentifier", "state", 30)
+  For i = 0 To UBound(intCharArray)
+    strStateCode = intCharArray(i)    
+    objState.Touch
+    objState.SetText ("")
+    objState.Keys strStateCode
+    aqutils.Delay (200)
+    objMobileApp.FindChild ("ObjectIdentifier", "postalCode", 30).Touch
+    intGetStringLength = Len(objMobileApp.FindChild ("ObjectIdentifier", "state", 30).wText)
+  
+    If intGetStringLength = 2 Then
+      If stringExist(Global.arrStateCode, strStateCode) And objMobileApp.FindChild ("className", "help-block error-message hidden", 30).Exists Then
+        logMessage "PASS", "Number of Characters in State", "Number of characters accepted was: " & intGetStringLength _
+          & " and State code entered: '" & strStateCode & "' was a valid State/Province Code", 100
+        
+        ElseIf stringExist(Global.arrStateCode, strStateCode) And objMobileApp.FindChild ("className", "help-block error-message", 30).Exists Then
+        logMessage "FAIL", "Number of Characters in State", "Number of characters accepted was: " & intGetStringLength _
+          & " and State code entered: '" & strStateCode & "' was not a valid State/Province Code", 100
+        
+        ElseIf stringExist(Global.arrStateCode, strStateCode) = False And objMobileApp.FindChild ("className", "help-block error-message", 30).Exists Then
+        strErrorText = objMobileApp.FindChild ("className", "help-block error-message", 30).TextContent
+        logMessage "Pass", "Number of Characters in State", "Number of characters accepted was: " & intGetStringLength _
+          & " but the State/Province Code entered: '" & strStateCode & "' was not a valid. Following error message displays" _
+          & VbCr & VbTab & strErrorText, 300
+        
+        ElseIf stringExist(Global.arrStateCode, strStateCode) = False And objMobileApp.FindChild ("className", "help-block error-message hidden", 30).Exists Then
+        logMessage "Fail", "Number of Characters in State", "Number of characters accepted was: " & intGetStringLength _
+          & " and the State/Province code entered: '" & strStateCode & "' was not valid", 100
+      End If
+      
+    ElseIf intGetStringLength = 1 Then
+      strTextCaptured = ""
+      If objMobileApp.FindChild ("className", "help-block error-message", 30).Exists Then
+        strTextCaptured = objMobileApp.FindChild ("className", "help-block error-message", 30).TextContent
+      End If
+      
+      If strTextCaptured = stateErrorText1 Then
+        logMessage "Pass", "Number of Characters in State", "Number of characters accepted was: " & intGetStringLength & ". Invalid State" _
+          & "/Province Code: '" & strStateCode & "' was entered. Following error message displays" & VbCr & VbTab & strTextCaptured, 100
+        Else
+        logMessage "Fail", "Number of Characters in State", "Number of characters accepted was: " & intGetStringLength & ". Invalid State" _
+          & "/Province Code: '" & strStateCode & "' was entered. Following error message displays" & VbCr & VbTab & strTextCaptured, 300
+      End If
+      
+    ElseIf intGetStringLength = 0 Then
+      strCapturedText = ""
+      If objMobileApp.FindChild ("className", "help-block error-message", 30).Exists Then
+        strCapturedText = objMobileApp.FindChild ("className", "help-block error-message", 30).ContentText
+      End If
+      
+      If strCapturedText = stateErrorText2 Then
+        logMessage "Pass", "Number of Characters in State", "Number of characters accepted was: " & intGetStringLength _
+          & ". No State/Province Code was entered. Following error message displays" & VbCr & VbTab & strCapturedText, 100
+        Else
+        logMessage "Fail", "Number of Characters in State", "Number of characters accepted was: " & intGetStringLength _
+          & ". No State/Province Code was entered. Following error message displays" & VbCr & VbTab & strCapturedText, 300
+      End If
+         
+      Else
+      logMessage "Fail", "Number of Characters in State", "Number of characters accepted was: " & intGetStringLength _
+          & ". State/Province Code was entered. Following error message displays" & VbCr & VbTab & stateErrorText2, 300
+    End If
+  Next
+
+End Sub

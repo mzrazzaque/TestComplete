@@ -654,3 +654,12 @@ Public Function createStringByLength(intLength)
     createStringByLength = createStringByLength & Mid(strString, Int(Rnd() * Len(strString) + 1), 1)
   Next
 End Function
+
+Public Function removeLastCharFromString (strString, chrCharacter)
+  On Error Resume Next
+  If Right(strString, 1) = chrCharacter Then
+    strString = Left(strString, Len(strString) - 1)
+  End If
+  
+  removeLastCharFromString = strString
+End Function

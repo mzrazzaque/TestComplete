@@ -14,18 +14,29 @@
 ' ##############################################################################################
 
 Public Sub initDevice
+  Dim strDeviceName
   ' Checking Device Connection
   If Mobile.Device("*", 1).Exists Then
-    'Connecting to Mobile
-    Mobile.SetCurrent("*")
-    If(TestedApps.TCF_iOS.Run)Then    
-      Else
-      logMessage "FAIL", "Application executable", "Application executable not found" & VbCr & "Exiting Test ...", 500
-      Runner.Stop (True)
-    End If  
-    Mobile.Device("*").Process("TCF Bank").WaitChild "Exists",5000
-    ' Creating TCF App object
-    Set Global.objMobileApp = Mobile.Device("*").Process("TCF Bank")
+    intDeviceCount = Mobile.ChildCount
+    For i = 0 to intDeviceCount - 1
+      strFullDeviceName = Mobile.Child(i).FullName
+      strFullDeviceNameArray = Split (strFullDeviceName, """")
+      strDeviceName = strFullDeviceNameArray (1)
+      
+      ' Connecting to Mobile
+      Mobile.SetCurrent("*")
+      If(TestedApps.TCF_iOS.Run)Then
+        Else
+        logMessage "FAIL", "Application executable", "Application executable not found" & VbCr & "Exiting Test ...", 500
+        Runner.Stop (True)
+      End If  
+      
+      Mobile.Device(strDeviceName).Process("TCF Bank").WaitChild "Exists",5000
+      
+      ' Creating TCF App object
+      Set Global.objMobileApp = Mobile.Device("*").Process("TCF Bank")
+    Next
+  
     Else
     logMessage "FAIL", "Device Availability", "No Devices available" & VbCr & "Exiting Test ...", 500
     Runner.Stop (True)

@@ -10,7 +10,6 @@
 ' ##############################################################################################
 
 ' Global Objects
-'Change for version control
 Dim objMobileApp
 Dim objStopWatch
 Dim objLoginPage
